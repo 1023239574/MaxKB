@@ -8,20 +8,17 @@
     @submit.prevent
   >
     <el-form-item label="分段标题">
-      <el-input v-if="isEdit" v-model="form.title" placeholder="请输入分段标题"> </el-input>
+      <el-input
+        v-if="isEdit"
+        v-model="form.title"
+        placeholder="请输入分段标题"
+        maxlength="256"
+        show-word-limit
+      >
+      </el-input>
       <span class="lighter" v-else>{{ form.title || '-' }}</span>
     </el-form-item>
     <el-form-item label="分段内容" prop="content">
-      <!-- <el-input
-        v-if="isEdit"
-        v-model="form.content"
-        placeholder="请输入分段内容"
-        maxlength="4096"
-        show-word-limit
-        :rows="8"
-        type="textarea"
-      > 
-     </el-input>-->
       <MarkdownEditor
         v-if="isEdit"
         v-model="form.content"
@@ -31,7 +28,12 @@
         :toolbars="toolbars"
         style="height: 300px"
         @onUploadImg="onUploadImg"
-      />
+        :footers="footers"
+      >
+        <template #defFooters>
+          <span style="margin-left: -6px">/ 4096</span>
+        </template>
+      </MarkdownEditor>
       <MdPreview
         v-else
         ref="editorRef"
@@ -39,12 +41,11 @@
         :modelValue="form.content"
         class="maxkb-md"
       />
-      <!-- <span v-else class="break-all lighter">{{ form.content }}</span> -->
     </el-form-item>
   </el-form>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onUnmounted, watch, nextTick } from 'vue'
+import { ref, reactive, onUnmounted, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MdPreview } from 'md-editor-v3'
 import MarkdownEditor from '@/components/markdown-editor/index.vue'
@@ -86,6 +87,8 @@ const toolbars = [
   'preview',
   'htmlPreview'
 ] as any[]
+
+const footers = ['markdownTotal', 0, '=', 1, 'scrollSwitch']
 
 const editorRef = ref()
 

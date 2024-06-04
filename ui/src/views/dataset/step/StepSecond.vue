@@ -81,7 +81,12 @@
               </el-radio-group>
             </div>
           </el-scrollbar>
-          <div class="text-right">
+          <div>
+            <el-checkbox v-model="checkedConnect" @change="changeHandle">
+              导入时添加分段标题为关联问题（适用于标题为问题的问答对）
+            </el-checkbox>
+          </div>
+          <div class="text-right mt-8">
             <el-button @click="splitDocument">生成预览</el-button>
           </div>
         </div>
@@ -90,7 +95,8 @@
       <el-col :span="14" class="p-24 border-l">
         <div v-loading="loading">
           <h4 class="title-decoration-1 mb-8">分段预览</h4>
-          <ParagraphPreview v-model:data="paragraphList" />
+
+          <ParagraphPreview v-model:data="paragraphList" :isConnect="checkedConnect" />
         </div>
       </el-col>
     </el-row>
@@ -110,6 +116,9 @@ const radio = ref('1')
 const loading = ref(false)
 const paragraphList = ref<any[]>([])
 const patternLoading = ref<boolean>(false)
+const checkedConnect = ref<boolean>(false)
+
+const firstChecked = ref(true)
 
 const form = reactive<{
   patterns: Array<string>
@@ -122,6 +131,24 @@ const form = reactive<{
   with_filter: true
 })
 
+function changeHandle(val: boolean) {
+  if (val && firstChecked.value) {
+    const list = paragraphList.value
+    list.map((item: any) => {
+      item.content.map((v: any) => {
+        v['problem_list'] = v.title.trim()
+          ? [
+              {
+                content: v.title.trim()
+              }
+            ]
+          : []
+      })
+    })
+    paragraphList.value = list
+    firstChecked.value = false
+  }
+}
 function splitDocument() {
   loading.value = true
   let fd = new FormData()
@@ -142,7 +169,21 @@ function splitDocument() {
   documentApi
     .postSplitDocument(fd)
     .then((res: any) => {
-      paragraphList.value = res.data
+      const list = res.data
+      if (checkedConnect.value) {
+        list.map((item: any) => {
+          item.content.map((v: any) => {
+            v['problem_list'] = v.title.trim()
+              ? [
+                  {
+                    content: v.title.trim()
+                  }
+                ]
+              : []
+          })
+        })
+      }
+      paragraphList.value = list
       loading.value = false
     })
     .catch(() => {
@@ -167,7 +208,8 @@ onMounted(() => {
 })
 
 defineExpose({
-  paragraphList
+  paragraphList,
+  checkedConnect
 })
 </script>
 <style scoped lang="scss">
@@ -175,7 +217,7 @@ defineExpose({
   width: 100%;
 
   .left-height {
-    max-height: calc(var(--create-dataset-height) - 70px);
+    max-height: calc(var(--create-dataset-height) - 110px);
     overflow-x: hidden;
   }
 

@@ -37,17 +37,17 @@ from dataset.serializers.common_serializers import list_paragraph
 from embedding.models import SearchMode
 from setting.models import AuthOperate
 from setting.models.model_management import Model
-from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 
 token_cache = cache.caches['token_cache']
-chat_cache = cache.caches['chat_cache']
+chat_cache = cache.caches['model_cache']
 
 
 class ModelDatasetAssociation(serializers.Serializer):
     user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
-    model_id = serializers.CharField(required=True, error_messages=ErrMessage.char("模型id"))
+    model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                     error_messages=ErrMessage.char("模型id"))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True,
                                                                                              error_messages=ErrMessage.uuid(
                                                                                                  "知识库id")),
@@ -57,8 +57,9 @@ class ModelDatasetAssociation(serializers.Serializer):
         super().is_valid(raise_exception=True)
         model_id = self.data.get('model_id')
         user_id = self.data.get('user_id')
-        if not QuerySet(Model).filter(id=model_id).exists():
-            raise AppApiException(500, f'模型不存在【{model_id}】')
+        if model_id is not None and len(model_id) > 0:
+            if not QuerySet(Model).filter(id=model_id).exists():
+                raise AppApiException(500, f'模型不存在【{model_id}】')
         dataset_id_list = list(set(self.data.get('dataset_id_list')))
         exist_dataset_id_list = [str(dataset.id) for dataset in
                                  QuerySet(DataSet).filter(id__in=dataset_id_list, user_id=user_id)]
@@ -109,9 +110,10 @@ class ApplicationSerializer(serializers.Serializer):
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                  max_length=256, min_length=1,
                                  error_messages=ErrMessage.char("应用描述"))
-    model_id = serializers.CharField(required=True, error_messages=ErrMessage.char("模型"))
+    model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                     error_messages=ErrMessage.char("模型"))
     multiple_rounds_dialogue = serializers.BooleanField(required=True, error_messages=ErrMessage.char("多轮对话"))
-    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=1024,
+    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                      error_messages=ErrMessage.char("开场白"))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                  allow_null=True, error_messages=ErrMessage.list("关联知识库"))
@@ -257,10 +259,11 @@ class ApplicationSerializer(serializers.Serializer):
                                      error_messages=ErrMessage.char("应用名称"))
         desc = serializers.CharField(required=False, max_length=256, min_length=1, allow_null=True, allow_blank=True,
                                      error_messages=ErrMessage.char("应用描述"))
-        model_id = serializers.CharField(required=False, error_messages=ErrMessage.char("模型"))
+        model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True,
+                                         error_messages=ErrMessage.char("模型"))
         multiple_rounds_dialogue = serializers.BooleanField(required=False,
                                                             error_messages=ErrMessage.boolean("多轮会话"))
-        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=1024,
+        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                          error_messages=ErrMessage.char("开场白"))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                      error_messages=ErrMessage.list("关联知识库")
@@ -317,9 +320,9 @@ class ApplicationSerializer(serializers.Serializer):
         id = serializers.CharField(required=True, error_messages=ErrMessage.uuid("应用id"))
         user_id = serializers.UUIDField(required=False, error_messages=ErrMessage.uuid("用户id"))
         query_text = serializers.CharField(required=True, error_messages=ErrMessage.char("查询文本"))
-        top_number = serializers.IntegerField(required=True, max_value=10, min_value=1,
+        top_number = serializers.IntegerField(required=True, max_value=100, min_value=1,
                                               error_messages=ErrMessage.integer("topN"))
-        similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
+        similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
                                             error_messages=ErrMessage.float("相关度"))
         search_mode = serializers.CharField(required=True, validators=[
             validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
@@ -497,22 +500,21 @@ class ApplicationSerializer(serializers.Serializer):
             application_id = self.data.get("application_id")
 
             application = QuerySet(Application).get(id=application_id)
-
-            model = QuerySet(Model).filter(
-                id=instance.get('model_id') if 'model_id' in instance else application.model_id,
-                user_id=application.user_id).first()
-            if model is None:
-                raise AppApiException(500, "模型不存在")
-
+            if instance.get('model_id') is None or len(instance.get('model_id')) == 0:
+                application.model_id = None
+            else:
+                model = QuerySet(Model).filter(
+                    id=instance.get('model_id'),
+                    user_id=application.user_id).first()
+                if model is None:
+                    raise AppApiException(500, "模型不存在")
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization',
                            'api_key_is_active', 'icon']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':
-                        application.__setattr__('dialogue_number',
-                                                0 if not instance.get(update_key) else ModelProvideConstants[
-                                                    model.provider].value.get_dialogue_number())
+                        application.__setattr__('dialogue_number', 0 if not instance.get(update_key) else 3)
                     else:
                         application.__setattr__(update_key, instance.get(update_key))
             application.save()
@@ -533,6 +535,7 @@ class ApplicationSerializer(serializers.Serializer):
                 QuerySet(ApplicationDatasetMapping).bulk_create(
                     [ApplicationDatasetMapping(application_id=application_id, dataset_id=dataset_id) for dataset_id in
                      dataset_id_list]) if len(dataset_id_list) > 0 else None
+            chat_cache.clear_by_application_id(application_id)
             return self.one(with_valid=False)
 
         def list_dataset(self, with_valid=True):
@@ -583,6 +586,15 @@ class ApplicationSerializer(serializers.Serializer):
         class Edit(serializers.Serializer):
             is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("是否可用"))
 
+            allow_cross_domain = serializers.BooleanField(required=False,
+                                                          error_messages=ErrMessage.boolean("是否允许跨域"))
+
+            cross_domain_list = serializers.ListSerializer(required=False,
+                                                           child=serializers.CharField(required=True,
+                                                                                       error_messages=ErrMessage.char(
+                                                                                           "跨域列表")),
+                                                           error_messages=ErrMessage.char("跨域地址"))
+
         class Operate(serializers.Serializer):
             application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
 
@@ -599,15 +611,17 @@ class ApplicationSerializer(serializers.Serializer):
             def edit(self, instance, with_valid=True):
                 if with_valid:
                     self.is_valid(raise_exception=True)
-                    ApplicationSerializer.Edit(data=instance).is_valid(raise_exception=True)
-
+                    ApplicationSerializer.ApplicationKeySerializer.Edit(data=instance).is_valid(raise_exception=True)
+                api_key_id = self.data.get("api_key_id")
+                application_id = self.data.get('application_id')
+                application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
+                                                                         application_id=application_id).first()
+                if application_api_key is None:
+                    raise AppApiException(500, '不存在')
                 if 'is_active' in instance and instance.get('is_active') is not None:
-                    api_key_id = self.data.get("api_key_id")
-                    application_id = self.data.get('application_id')
-                    application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
-                                                                             application_id=application_id).first()
-                    if application_api_key is None:
-                        raise AppApiException(500, '不存在')
-
                     application_api_key.is_active = instance.get('is_active')
-                    application_api_key.save()
+                if 'allow_cross_domain' in instance and instance.get('allow_cross_domain') is not None:
+                    application_api_key.allow_cross_domain = instance.get('allow_cross_domain')
+                if 'cross_domain_list' in instance and instance.get('cross_domain_list') is not None:
+                    application_api_key.cross_domain_list = instance.get('cross_domain_list')
+                application_api_key.save()

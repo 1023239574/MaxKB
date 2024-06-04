@@ -1,7 +1,12 @@
 <template>
   <div>
-    <el-tooltip effect="dark" content="重新生成" placement="top">
-      <el-button text @click="regeneration">
+    <el-text type="info">
+      <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
+    </el-text>
+  </div>
+  <div>
+    <el-tooltip effect="dark" content="换个答案" placement="top">
+      <el-button :disabled="chat_loading" text @click="regeneration">
         <AppIcon iconName="VideoPlay"></AppIcon>
       </el-button>
     </el-tooltip>
@@ -56,9 +61,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
+import { ref } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
+import { datetimeFormat } from '@/utils/time'
 const props = defineProps({
   data: {
     type: Object,
@@ -68,9 +74,12 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  chartId: {
+  chatId: {
     type: String,
     default: ''
+  },
+  chat_loading: {
+    type: Boolean
   },
   log: Boolean
 })
@@ -86,8 +95,8 @@ function regeneration() {
 
 function voteHandle(val: string) {
   applicationApi
-    .putChatVote(props.applicationId, props.chartId, props.data.record_id, val, loading)
-    .then((res) => {
+    .putChatVote(props.applicationId, props.chatId, props.data.record_id, val, loading)
+    .then(() => {
       buttonData.value['vote_status'] = val
       emit('update:data', buttonData.value)
     })

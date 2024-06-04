@@ -119,9 +119,15 @@ const promise: (
 export const get: (
   url: string,
   params?: unknown,
-  loading?: NProgress | Ref<boolean>
-) => Promise<Result<any>> = (url: string, params: unknown, loading?: NProgress | Ref<boolean>) => {
-  return promise(request({ url: url, method: 'get', params }), loading)
+  loading?: NProgress | Ref<boolean>,
+  timeout?: number
+) => Promise<Result<any>> = (
+  url: string,
+  params: unknown,
+  loading?: NProgress | Ref<boolean>,
+  timeout?: number
+) => {
+  return promise(request({ url: url, method: 'get', params, timeout: timeout }), loading)
 }
 
 /**
@@ -136,9 +142,10 @@ export const post: (
   url: string,
   data?: unknown,
   params?: unknown,
-  loading?: NProgress | Ref<boolean>
-) => Promise<Result<any> | any> = (url, data, params, loading) => {
-  return promise(request({ url: url, method: 'post', data, params }), loading)
+  loading?: NProgress | Ref<boolean>,
+  timeout?: number
+) => Promise<Result<any> | any> = (url, data, params, loading, timeout) => {
+  return promise(request({ url: url, method: 'post', data, params, timeout }), loading)
 }
 
 /**|
@@ -153,9 +160,10 @@ export const put: (
   url: string,
   data?: unknown,
   params?: unknown,
-  loading?: NProgress | Ref<boolean>
-) => Promise<Result<any>> = (url, data, params, loading) => {
-  return promise(request({ url: url, method: 'put', data, params }), loading)
+  loading?: NProgress | Ref<boolean>,
+  timeout?: number
+) => Promise<Result<any>> = (url, data, params, loading, timeout) => {
+  return promise(request({ url: url, method: 'put', data, params, timeout }), loading)
 }
 
 /**
@@ -169,9 +177,10 @@ export const del: (
   url: string,
   params?: unknown,
   data?: unknown,
-  loading?: NProgress | Ref<boolean>
-) => Promise<Result<any>> = (url, params, data, loading) => {
-  return promise(request({ url: url, method: 'delete', params, data }), loading)
+  loading?: NProgress | Ref<boolean>,
+  timeout?: number
+) => Promise<Result<any>> = (url, params, data, loading, timeout) => {
+  return promise(request({ url: url, method: 'delete', params, data, timeout }), loading)
 }
 
 /**
@@ -202,8 +211,13 @@ export const exportExcel: (
   url: string,
   params: any,
   loading?: NProgress | Ref<boolean>
-) => void = (fileName: string, url: string, params: any, loading?: NProgress | Ref<boolean>) => {
-  promise(request({ url: url, method: 'get', params, responseType: 'blob' }), loading)
+) => Promise<any> = (
+  fileName: string,
+  url: string,
+  params: any,
+  loading?: NProgress | Ref<boolean>
+) => {
+  return promise(request({ url: url, method: 'get', params, responseType: 'blob' }), loading)
     .then((res: any) => {
       if (res) {
         const blob = new Blob([res], {
@@ -216,6 +230,7 @@ export const exportExcel: (
         //释放内存
         window.URL.revokeObjectURL(link.href)
       }
+      return true
     })
     .catch((e) => {})
 }

@@ -6,6 +6,7 @@
     @date：2023/10/20 14:01
     @desc:
 """
+import datetime
 import logging
 import os
 import traceback
@@ -51,8 +52,15 @@ class UpdateProblemArgs:
 
 
 class UpdateEmbeddingDatasetIdArgs:
-    def __init__(self, source_id_list: List[str], target_dataset_id: str):
-        self.source_id_list = source_id_list
+    def __init__(self, paragraph_id_list: List[str], target_dataset_id: str):
+        self.paragraph_id_list = paragraph_id_list
+        self.target_dataset_id = target_dataset_id
+
+
+class UpdateEmbeddingDocumentIdArgs:
+    def __init__(self, paragraph_id_list: List[str], target_document_id: str, target_dataset_id: str):
+        self.paragraph_id_list = paragraph_id_list
+        self.target_document_id = target_document_id
         self.target_dataset_id = target_dataset_id
 
 
@@ -116,6 +124,8 @@ class ListenerManagement:
         :return: None
         """
         max_kb.info(f"开始--->向量化文档:{document_id}")
+        QuerySet(Document).filter(id=document_id).update(**{'status': Status.embedding})
+        QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.embedding})
         status = Status.success
         try:
             data_list = native_search(
@@ -134,7 +144,8 @@ class ListenerManagement:
             status = Status.error
         finally:
             # 修改状态
-            QuerySet(Document).filter(id=document_id).update(**{'status': status})
+            QuerySet(Document).filter(id=document_id).update(
+                **{'status': status, 'update_time': datetime.datetime.now()})
             QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': status})
             max_kb.info(f"结束--->向量化文档:{document_id}")
 
@@ -213,12 +224,22 @@ class ListenerManagement:
 
     @staticmethod
     def update_embedding_dataset_id(args: UpdateEmbeddingDatasetIdArgs):
-        VectorStore.get_embedding_vector().update_by_source_ids(args.source_id_list,
-                                                                {'dataset_id': args.target_dataset_id})
+        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                   {'dataset_id': args.target_dataset_id})
+
+    @staticmethod
+    def update_embedding_document_id(args: UpdateEmbeddingDocumentIdArgs):
+        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                   {'document_id': args.target_document_id,
+                                                                    'dataset_id': args.target_dataset_id})
 
     @staticmethod
     def delete_embedding_by_source_ids(source_ids: List[str]):
         VectorStore.get_embedding_vector().delete_by_source_ids(source_ids, SourceType.PROBLEM)
+
+    @staticmethod
+    def delete_embedding_by_paragraph_ids(paragraph_ids: List[str]):
+        VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_ids)
 
     @staticmethod
     def delete_embedding_by_dataset_id_list(source_ids: List[str]):

@@ -16,23 +16,23 @@
       >
         <div class="flex align-center cursor">
           <AppIcon iconName="app-reading" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
-          <span>用户手册</span>
+          <span>{{ $t('layout.topbar.wiki') }}</span>
         </div>
       </el-card>
       <el-card shadow="hover" class="mb-16" @click="toUrl('https://github.com/1Panel-dev/MaxKB')">
         <div class="flex align-center cursor">
           <AppIcon iconName="app-github" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
-          <span>项目地址</span>
+          <span>{{ $t('layout.topbar.github') }}</span>
         </div>
       </el-card>
       <el-card shadow="hover" class="mb-16" @click="toUrl('https://bbs.fit2cloud.com/c/mk/11')">
         <div class="flex align-center cursor">
           <AppIcon iconName="app-help" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
-          <span>论坛求助</span>
+          <span>{{ $t('layout.topbar.forum') }}</span>
         </div>
       </el-card>
     </div>
-    <div class="text-center">版本号：{{ version }}</div>
+    <div class="text-center">{{ $t('layout.topbar.avatar.version') }}:{{ user.version }}</div>
   </el-dialog>
 </template>
 <script setup lang="ts">
@@ -41,7 +41,6 @@ import useStore from '@/stores'
 const defaultTitle = import.meta.env.VITE_APP_TITLE
 
 const { user } = useStore()
-const version = user.version
 
 const aboutDialogVisible = ref(false)
 

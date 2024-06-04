@@ -35,7 +35,7 @@ from common.util.common import post
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
-from common.util.rsa_util import decrypt
+from common.util.rsa_util import rsa_long_decrypt
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
@@ -55,6 +55,18 @@ class ChatSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id')).delete()
             return True
+
+    class ClientChatHistory(serializers.Serializer):
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+        client_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("客户端id"))
+
+        def page(self, current_page: int, page_size: int, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            queryset = QuerySet(Chat).filter(client_id=self.data.get('client_id'),
+                                             application_id=self.data.get('application_id'))
+            queryset = queryset.order_by('-create_time')
+            return page_search(current_page, page_size, queryset, lambda row: ChatSerializerModel(row).data)
 
     class Query(serializers.Serializer):
         abstract = serializers.CharField(required=False, error_messages=ErrMessage.char("摘要"))
@@ -198,7 +210,8 @@ class ChatSerializers(serializers.Serializer):
             if model is not None:
                 chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
                                                                                    json.loads(
-                                                                                       decrypt(model.credential)),
+                                                                                       rsa_long_decrypt(
+                                                                                           model.credential)),
                                                                                    streaming=True)
 
             chat_id = str(uuid.uuid1())
@@ -216,7 +229,8 @@ class ChatSerializers(serializers.Serializer):
 
         id = serializers.UUIDField(required=False, allow_null=True,
                                    error_messages=ErrMessage.uuid("应用id"))
-        model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
+        model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                         error_messages=ErrMessage.uuid("模型id"))
 
         multiple_rounds_dialogue = serializers.BooleanField(required=True,
                                                             error_messages=ErrMessage.boolean("多轮会话"))
@@ -252,14 +266,18 @@ class ChatSerializers(serializers.Serializer):
             user_id = self.is_valid(raise_exception=True)
             chat_id = str(uuid.uuid1())
             main_account = self.data.get('main_account')
-            model = QuerySet(Model).filter(user_id=user_id, id=self.data.get('model_id')).first()
-            if model is None:
-                raise AppApiException(500, "模型不存在")
+            model_id = self.data.get('model_id')
+            if model_id is not None and len(model_id) > 0:
+                model = QuerySet(Model).filter(user_id=user_id, id=self.data.get('model_id')).first()
+                chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
+                                                                                   json.loads(
+                                                                                       rsa_long_decrypt(
+                                                                                           model.credential)),
+                                                                                   streaming=True)
+            else:
+                model = None
+                chat_model = None
             dataset_id_list = self.data.get('dataset_id_list')
-            chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                               json.loads(
-                                                                                   decrypt(model.credential)),
-                                                                               streaming=True)
             application = Application(id=None, dialogue_number=3, model=model,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),
@@ -280,6 +298,12 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
         fields = ['id', 'chat_id', 'vote_status', 'problem_text', 'answer_text',
                   'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index',
                   'create_time', 'update_time']
+
+
+class ChatSerializerModel(serializers.ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = ['id', 'application_id', 'abstract', 'client_id']
 
 
 class ChatRecordSerializer(serializers.Serializer):
@@ -319,13 +343,16 @@ class ChatRecordSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
         chat_id = serializers.UUIDField(required=True)
+        order_asc = serializers.BooleanField(required=False)
 
         def list(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id'))
+            order_by = 'create_time' if self.data.get('order_asc') is None or self.data.get(
+                'order_asc') else '-create_time'
             return [ChatRecordSerializerModel(chat_record).data for chat_record in
-                    QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by("create_time")]
+                    QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by(order_by)]
 
         @staticmethod
         def reset_chat_record(chat_record):
@@ -354,8 +381,10 @@ class ChatRecordSerializer(serializers.Serializer):
         def page(self, current_page: int, page_size: int, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            order_by = 'create_time' if self.data.get('order_asc') is None or self.data.get(
+                'order_asc') else '-create_time'
             page = page_search(current_page, page_size,
-                               QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by("create_time"),
+                               QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by(order_by),
                                post_records_handler=lambda chat_record: self.reset_chat_record(chat_record))
             return page
 
@@ -399,9 +428,12 @@ class ChatRecordSerializer(serializers.Serializer):
             return True
 
     class ImproveSerializer(serializers.Serializer):
-        title = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+        title = serializers.CharField(required=False, max_length=256, allow_null=True, allow_blank=True,
                                       error_messages=ErrMessage.char("段落标题"))
         content = serializers.CharField(required=True, error_messages=ErrMessage.char("段落内容"))
+
+        problem_text = serializers.CharField(required=False, max_length=256, allow_null=True, allow_blank=True,
+                                             error_messages=ErrMessage.char("问题"))
 
     class ParagraphModel(serializers.ModelSerializer):
         class Meta:
@@ -473,8 +505,9 @@ class ChatRecordSerializer(serializers.Serializer):
                                   content=instance.get("content"),
                                   dataset_id=dataset_id,
                                   title=instance.get("title") if 'title' in instance else '')
-
-            problem = Problem(id=uuid.uuid1(), content=chat_record.problem_text, dataset_id=dataset_id)
+            problem_text = instance.get('problem_text') if instance.get(
+                'problem_text') is not None else chat_record.problem_text
+            problem = Problem(id=uuid.uuid1(), content=problem_text, dataset_id=dataset_id)
             problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid1(), dataset_id=dataset_id,
                                                                 document_id=document_id,
                                                                 problem_id=problem.id,

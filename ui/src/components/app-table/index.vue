@@ -1,6 +1,6 @@
 <template>
   <div class="app-table" :class="quickCreate ? 'table-quick-append' : ''">
-    <el-table :max-height="tableHeight" v-bind="$attrs">
+    <el-table :max-height="tableHeight" v-bind="$attrs" ref="appTableRef">
       <template #append v-if="quickCreate">
         <div v-if="showInput">
           <el-input
@@ -12,6 +12,7 @@
             :maxlength="quickCreateMaxlength || '-'"
             :show-word-limit="quickCreateMaxlength ? true : false"
             @keydown.enter="submitHandle"
+            clearable
           />
 
           <el-button type="primary" @click="submitHandle" :disabled="loading">创建</el-button>
@@ -79,6 +80,7 @@ const paginationConfig = computed(() => props.paginationConfig)
 const pageSizes = [10, 20, 50, 100]
 
 const quickInputRef = ref()
+const appTableRef = ref()
 
 const loading = ref(false)
 const showInput = ref(false)
@@ -123,7 +125,13 @@ function handleCurrentChange() {
     common.savePage(props.storeKey, props.paginationConfig)
   }
 }
-defineExpose({})
+
+function clearSelection() {
+  appTableRef.value?.clearSelection()
+}
+defineExpose({
+  clearSelection
+})
 
 onMounted(() => {
   tableHeight.value = window.innerHeight - 300
