@@ -141,6 +141,7 @@
       </div>
     </el-scrollbar>
     <div class="ai-chat__operate p-24" v-if="!log">
+      <div class="clear-context" v-if="chatList.length>0"><span @click="clearContext"><el-icon><ChatLineRound /></el-icon>清空对话</span></div>
       <div class="operate-textarea flex">
         <el-input
           ref="quickInputRef"
@@ -210,7 +211,8 @@ const props = defineProps({
   chatId: {
     type: String,
     default: ''
-  } // 历史记录Id
+  }, // 历史记录Id
+  mainAccount: String
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
@@ -345,12 +347,34 @@ const startChat = (chat: chatType) => {
 /**
  * 对话
  */
+ function clearContext(){
+  chatList.value = []
+   if (props.appId && props.mainAccount) {
+    return applicationApi
+      .getChatOpen(props.appId, props.mainAccount)
+      .then((res) => {
+        chartOpenId.value = res.data
+      })
+      .catch((res) => {
+        if (res.response.status === 403) {
+          application.asyncAppAuthentication(accessToken).then(() => {
+            clearContext()
+          })
+        } else {
+          loading.value = false
+          return Promise.reject(res)
+        }
+      })
+  }
+
+}
 function getChartOpenId(chat?: any) {
   loading.value = true
   const obj = props.data
-  if (props.appId) {
+  obj.main_account = props.mainAccount
+  if (props.appId && props.mainAccount) {
     return applicationApi
-      .getChatOpen(props.appId)
+      .getChatOpen(props.appId, props.mainAccount)
       .then((res) => {
         chartOpenId.value = res.data
         chatMessage(chat)
@@ -684,6 +708,28 @@ defineExpose({
       top: -16px;
       left: 0;
       height: 16px;
+    }
+    .clear-context{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      span{
+        color: #141414;
+        font-size: 13px;
+        border:1px solid #ddd;
+        border-radius: 20px;
+        padding: 5px 15px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        i{
+          margin-right: 5px;
+          font-size: 15px;
+        }
+      }
+
     }
     .operate-textarea {
       box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);

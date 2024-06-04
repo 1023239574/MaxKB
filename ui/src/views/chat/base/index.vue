@@ -10,6 +10,7 @@
         v-model:data="applicationDetail"
         :available="applicationAvailable"
         :appId="applicationDetail?.id"
+        :mainAccount = "mainAccount"
       ></AiChat>
     </div>
     <div class="chat__footer"></div>
@@ -22,7 +23,7 @@ import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()
 const {
-  params: { accessToken }
+  params: { accessToken, mainAccount }
 } = route as any
 
 const { application, user } = useStore()

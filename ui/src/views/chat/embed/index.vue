@@ -13,6 +13,7 @@
         :appId="applicationDetail?.id"
         :record="currentRecordList"
         :chatId="currentChatId"
+        :mainAccount = "mainAccount"
         @refresh="refresh"
         @scroll="handleScroll"
         class="AiChat-embed"
@@ -70,7 +71,7 @@ import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()
 const {
-  params: { accessToken }
+  params: { accessToken, mainAccount }
 } = route as any
 
 const { application, user, log } = useStore()

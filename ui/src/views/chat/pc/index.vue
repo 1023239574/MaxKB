@@ -78,6 +78,7 @@
             :appId="applicationDetail?.id"
             :record="currentRecordList"
             :chatId="currentChatId"
+            :mainAccount = "mainAccount"
             @refresh="refresh"
             @scroll="handleScroll"
           ></AiChat>
@@ -106,7 +107,7 @@ useResize()
 const route = useRoute()
 
 const {
-  params: { accessToken }
+  params: { accessToken, mainAccount }
 } = route as any
 
 const { application, user, log, common } = useStore()
