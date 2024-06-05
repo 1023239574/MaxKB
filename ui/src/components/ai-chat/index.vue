@@ -141,7 +141,7 @@
       </div>
     </el-scrollbar>
     <div class="ai-chat__operate p-24" v-if="!log">
-      <div class="clear-context" v-if="chatList.length>0"><span @click="clearContext"><el-icon><ChatLineRound /></el-icon>清空对话</span></div>
+     <!--  <div class="clear-context" v-if="chatList.length>0"><span @click="clearContext"><el-icon><ChatLineRound /></el-icon>清空对话</span></div> -->
       <div class="operate-textarea flex">
         <el-input
           ref="quickInputRef"
@@ -347,27 +347,6 @@ const startChat = (chat: chatType) => {
 /**
  * 对话
  */
- function clearContext(){
-  chatList.value = []
-   if (props.appId && props.mainAccount) {
-    return applicationApi
-      .getChatOpen(props.appId, props.mainAccount)
-      .then((res) => {
-        chartOpenId.value = res.data
-      })
-      .catch((res) => {
-        if (res.response.status === 403) {
-          application.asyncAppAuthentication(accessToken).then(() => {
-            clearContext()
-          })
-        } else {
-          loading.value = false
-          return Promise.reject(res)
-        }
-      })
-  }
-
-}
 function getChartOpenId(chat?: any) {
   loading.value = true
   const obj = props.data
