@@ -87,7 +87,7 @@ const initChat=(root)=>{
   // 添加对话icon
   root.insertAdjacentHTML("beforeend",chatButtonHtml)
   // 添加对话框
-  root.insertAdjacentHTML('beforeend',getChatContainerHtml('{{protocol}}','{{host}}','{{token}}'))
+  root.insertAdjacentHTML('beforeend',getChatContainerHtml('{{protocol}}','{{host}}','{{token}}','{{mainAccount}}'))
   // 按钮元素
   const chat_button=root.querySelector('.maxkb-chat-button')
   //  对话框元素
