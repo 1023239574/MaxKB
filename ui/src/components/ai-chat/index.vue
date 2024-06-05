@@ -141,7 +141,6 @@
       </div>
     </el-scrollbar>
     <div class="ai-chat__operate p-24" v-if="!log">
-     <!--  <div class="clear-context" v-if="chatList.length>0"><span @click="clearContext"><el-icon><ChatLineRound /></el-icon>清空对话</span></div> -->
       <div class="operate-textarea flex">
         <el-input
           ref="quickInputRef"
@@ -687,28 +686,6 @@ defineExpose({
       top: -16px;
       left: 0;
       height: 16px;
-    }
-    .clear-context{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 10px;
-      span{
-        color: #141414;
-        font-size: 13px;
-        border:1px solid #ddd;
-        border-radius: 20px;
-        padding: 5px 15px;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-
-        i{
-          margin-right: 5px;
-          font-size: 15px;
-        }
-      }
-
     }
     .operate-textarea {
       box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
