@@ -5,7 +5,7 @@
         <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
-              <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
+              <img src="@/assets/icon_robot.png" style="width: 90%;height:auto" alt="" />
             </AppAvatar>
           </div>
 
@@ -37,7 +37,7 @@
           <div class="item-content mb-16 lighter">
             <div class="avatar">
               <AppAvatar>
-                <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                <img src="@/assets/user-icon.png" style="width: 57%;height:auto" alt="" />
               </AppAvatar>
             </div>
             <div class="content">
@@ -50,7 +50,7 @@
           <div class="item-content mb-16 lighter">
             <div class="avatar">
               <AppAvatar class="avatar-gradient">
-                <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
+                <img src="@/assets/icon_robot.png" style="width: 90%;height:auto" alt="" />
               </AppAvatar>
             </div>
 
