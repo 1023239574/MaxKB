@@ -11,7 +11,7 @@
         <div class="question-title clearfix" v-if="questionTitle">
           <div class="avatar">
             <AppAvatar>
-              <img src="@/assets/user-icon.png" style="width: 57%;height:auto" alt="" />
+              <img src="@/assets/user-icon.png" style="width: 60%;height:auto" alt="" />
             </AppAvatar>
           </div>
           <div class="content">
