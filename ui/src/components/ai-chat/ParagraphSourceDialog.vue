@@ -43,7 +43,7 @@
                   </template>
                   <template #footer>
                     <div class="footer-content flex-between">
-                      <el-text>
+                      <el-text style="overflow: hidden;white-space: nowrap;">
                         <el-icon>
                           <Document />
                         </el-icon>

@@ -282,7 +282,7 @@ onMounted(() => {
     }
   }
   .chat-width {
-    max-width: var(--app-chat-width, 860px);
+    max-width: var(--app-chat-width, 957px);
     margin: 0 auto;
   }
   .AiChat-embed {

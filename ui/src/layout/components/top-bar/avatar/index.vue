@@ -2,7 +2,7 @@
   <el-dropdown trigger="click" type="primary">
     <div class="flex-center cursor">
       <AppAvatar>
-        <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+        <img src="@/assets/user-icon.png" style="width: 57%;height:auto" alt="" />
       </AppAvatar>
       <span class="ml-8">{{ user.userInfo?.username }}</span>
       <el-icon class="el-icon--right">
