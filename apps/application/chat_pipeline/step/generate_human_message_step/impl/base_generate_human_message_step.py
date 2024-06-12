@@ -15,6 +15,7 @@ from application.chat_pipeline.step.generate_human_message_step.i_generate_human
     IGenerateHumanMessageStep
 from application.models import ChatRecord
 from common.util.split_model import flat_map
+import logging
 
 
 class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
@@ -32,9 +33,11 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
             'value')
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
         start_index = len(history_chat_record) - dialogue_number
+        logging.getLogger("max_kb").info(f'start_index:{start_index}')
         history_message = [[history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
                            for index in
                            range(start_index if start_index > 0 else 0, len(history_chat_record))]
+        logging.getLogger("max_kb").info(f'history_message:{history_message}')
         return [*flat_map(history_message),
                 self.to_human_message(prompt, exec_problem_text, max_paragraph_char_number, paragraph_list,
                                       no_references_setting)]
