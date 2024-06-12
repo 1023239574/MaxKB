@@ -109,7 +109,8 @@ class OpenAIModelProvider(IModelProvider):
         azure_chat_open_ai = OpenAIChatModel(
             model=model_name,
             openai_api_base=model_credential.get('api_base'),
-            openai_api_key=model_credential.get('api_key')
+            openai_api_key=model_credential.get('api_key'),
+            temperature=0
         )
         return azure_chat_open_ai
 
