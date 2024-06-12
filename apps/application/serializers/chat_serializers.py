@@ -267,6 +267,7 @@ class ChatSerializers(serializers.Serializer):
             chat_id = str(uuid.uuid1())
             main_account = self.data.get('main_account')
             model_id = self.data.get('model_id')
+            multiple_rounds_dialogue = self.data.get('multiple_rounds_dialogue')
             if model_id is not None and len(model_id) > 0:
                 model = QuerySet(Model).filter(user_id=user_id, id=self.data.get('model_id')).first()
                 chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
@@ -278,7 +279,7 @@ class ChatSerializers(serializers.Serializer):
                 model = None
                 chat_model = None
             dataset_id_list = self.data.get('dataset_id_list')
-            application = Application(id=None, dialogue_number=3, model=model,
+            application = Application(id=None, dialogue_number=3 if multiple_rounds_dialogue else 0, model=model,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),
                                       problem_optimization=self.data.get('problem_optimization'))
