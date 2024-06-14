@@ -39,6 +39,9 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         paragraph_list = self.list_paragraph(embedding_list, vector)
         result = [self.reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
 
+        if result is None or len(result) == 0:
+            return []
+
         # 重排序
         rerank_model = RerankModel.get_rerank_model()
         rerank_index = rerank_model.rerank(exec_problem_text, [f'{paragraph.title}:{paragraph.content}' for paragraph in result]).get('rerank_ids')
