@@ -41,7 +41,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
 
         # 重排序
         rerank_model = RerankModel.get_rerank_model()
-        rerank_index = rerank_model.rerank(exec_problem_text, [f'{paragraph.title}:{paragraph.content}' for paragraph in result]).rerank_ids
+        rerank_index = rerank_model.rerank(exec_problem_text, [f'{paragraph.title}:{paragraph.content}' for paragraph in result]).get('rerank_ids')
         rerank_result = [result[index] for index in rerank_index][:top_n]
 
         return rerank_result
