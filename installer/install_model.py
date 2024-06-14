@@ -54,6 +54,13 @@ model_config = [
             'file_save_paths': [os.path.join(prefix_dir, 'embedding', "bge-large-zh-v1.5")]
         },
         'download_function': hg.get_batch_data
+    },
+    {
+        'download_params': {
+            'urls': ["https://huggingface.co/maidalun1020/bce-reranker-base_v1/tree/main"],
+            'file_save_paths': [os.path.join(prefix_dir, 'embedding', "bge-large-zh-v1.5")]
+        },
+        'download_function': hg.get_batch_data
     }
 
 ]

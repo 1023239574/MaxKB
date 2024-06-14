@@ -40,7 +40,8 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_DB_USER=root \
     MAXKB_DB_PASSWORD=Password123@postgres \
     MAXKB_EMBEDDING_MODEL_NAME=/opt/maxkb/model/embedding/bge-large-zh-v1.5 \
-    MAXKB_EMBEDDING_MODEL_PATH=/opt/maxkb/model/embedding
+    MAXKB_EMBEDDING_MODEL_PATH=/opt/maxkb/model/embedding \
+    RERANK_MODEL_NAME=/opt/maxkb/model/embedding/bce-rerank-base_v1 \
 
 WORKDIR /opt/maxkb/app
 COPY --from=stage-build /opt/maxkb /opt/maxkb
