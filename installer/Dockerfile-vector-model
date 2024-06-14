@@ -1,6 +1,6 @@
 FROM python:3.11-slim-bookworm as vector-model
 
-RUN echo "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" | huggingface-cli login
+RUN  pip3 install huggingface-cli &&  echo "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" | huggingface-cli login
 
 COPY installer/install_model.py install_model.py
 RUN pip3 install --upgrade pip setuptools && \
