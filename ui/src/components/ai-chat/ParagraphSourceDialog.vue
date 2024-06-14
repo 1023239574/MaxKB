@@ -33,7 +33,7 @@
                   </template>
                   <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
                   <template #description>
-                    <el-scrollbar height="150">
+                    <el-scrollbar max-height="270">
                       <MdPreview
                         ref="editorRef"
                         editorId="preview-only"
@@ -111,7 +111,9 @@ defineExpose({ open })
     height: calc(100vh - 260px);
   }
   .paragraph-source-card {
-    height: 260px;
+    height: auto;
+    max-height: 380px;
+    padding-bottom: 30px
   }
 }
 @media only screen and (max-width: 768px) {
@@ -121,7 +123,9 @@ defineExpose({ open })
       display: block;
     }
     .paragraph-source-card {
-      height: 285px;
+      height: auto;
+      max-height: 405px;
+      padding-bottom: 60px
     }
   }
 }
