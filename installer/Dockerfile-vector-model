@@ -1,7 +1,5 @@
 FROM python:3.11-slim-bookworm as vector-model
 
-RUN  pip3 install -U huggingface_hub &&  echo "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" | huggingface-cli login
-
 COPY installer/install_model.py install_model.py
 RUN pip3 install --upgrade pip setuptools && \
     pip install pycrawlers && \
