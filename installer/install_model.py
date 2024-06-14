@@ -10,7 +10,7 @@ import json
 import os.path
 from pycrawlers import huggingface
 from transformers import GPT2TokenizerFast
-hg = huggingface(token='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')
+hg = huggingface(token='adWIjbjnqNgisOBVCbkuBUDRixzdvtgoWDaNZLpnmFHwUGavAAUvQaZzWmTgkIYKSRSOZoQcmppHyqXYCCFEiqonFCoAFsiAZwJUkzGQPYEiTZCeNTeLVDigQmABCWPb')
 prefix_dir = "./model"
 model_config = [
     {
