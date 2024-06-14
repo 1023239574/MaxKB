@@ -13,7 +13,7 @@ from django.db.models import QuerySet
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.step.search_dataset_step.i_search_dataset_step import ISearchDatasetStep
-from common.config.embedding_config import VectorStore, EmbeddingModel
+from common.config.embedding_config import VectorStore, EmbeddingModel, RerankModel
 from common.db.search import native_search
 from common.util.file_util import get_file_content
 from dataset.models import Paragraph
@@ -31,13 +31,20 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         embedding_model = EmbeddingModel.get_embedding_model()
         embedding_value = embedding_model.embed_query(exec_problem_text)
         vector = VectorStore.get_embedding_vector()
+        # 默认召回topn+2个段落
         embedding_list = vector.query(exec_problem_text, embedding_value, dataset_id_list, exclude_document_id_list,
-                                      exclude_paragraph_id_list, True, top_n, similarity, SearchMode(search_mode))
+                                      exclude_paragraph_id_list, True, top_n+2, similarity, SearchMode(search_mode))
         if embedding_list is None:
             return []
         paragraph_list = self.list_paragraph(embedding_list, vector)
         result = [self.reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
-        return result
+
+        # 重排序
+        rerank_model = RerankModel.get_rerank_model()
+        rerank_index = rerank_model.rerank(exec_problem_text, [f'{paragraph.title}:{paragraph.content}' for paragraph in result]).rerank_ids
+        rerank_result = [result[index] for index in rerank_index][:top_n]
+
+        return rerank_result
 
     @staticmethod
     def reset_paragraph(paragraph: Dict, embedding_list: List) -> ParagraphPipelineModel:

@@ -10,7 +10,7 @@ import json
 import os.path
 from pycrawlers import huggingface
 from transformers import GPT2TokenizerFast
-hg = huggingface()
+hg = huggingface(token='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')
 prefix_dir = "./model"
 model_config = [
     {
@@ -51,6 +51,13 @@ model_config = [
     {
         'download_params': {
             'urls': ["https://huggingface.co/BAAI/bge-large-zh-v1.5/tree/main"],
+            'file_save_paths': [os.path.join(prefix_dir, 'embedding', "bge-large-zh-v1.5")]
+        },
+        'download_function': hg.get_batch_data
+    },
+    {
+        'download_params': {
+            'urls': ["https://huggingface.co/maidalun1020/bce-reranker-base_v1/tree/main"],
             'file_save_paths': [os.path.join(prefix_dir, 'embedding', "bge-large-zh-v1.5")]
         },
         'download_function': hg.get_batch_data

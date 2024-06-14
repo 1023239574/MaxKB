@@ -7,6 +7,7 @@
     @desc:
 """
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from BCEmbedding import RerankerModel
 
 from smartdoc.const import CONFIG
 
@@ -49,3 +50,20 @@ class VectorStore:
                                                               PGVector)
             VectorStore.instance = vector_store_class()
         return VectorStore.instance
+
+
+class RerankModel:
+    instance = None
+
+    @staticmethod
+    def get_rerank_model():
+        """
+        获取向量化模型
+        :return:
+        """
+        if RerankModel.instance is None:
+            model_name = CONFIG.get('RERANK_MODEL_NAME')
+            device = CONFIG.get('RERANK_DEVICE')
+            e = RerankerModel(model_name_or_path=model_name, device=device)
+            RerankModel.instance = e
+        return RerankModel.instance
