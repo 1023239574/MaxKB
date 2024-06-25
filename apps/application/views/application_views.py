@@ -466,7 +466,12 @@ class Application(APIView):
     class Statistics(APIView):
 
         @action(methods=['GET'], detail=False)
-        def get(self):
+        def get(self, request: Request):
             data = select_one(
                 get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'user_statistics.sql')), [])
+
+            data_size = select_one(
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'user_statistics.sql')), [])
+
+            data['resourceSize'] = data_size['database_size']
             return result.success(data)
