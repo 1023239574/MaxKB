@@ -54,5 +54,7 @@ urlpatterns = [
     path(
         'application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/dataset/<str:dataset_id>/document_id/<str:document_id>/improve/<str:paragraph_id>',
         views.ChatView.ChatRecord.Improve.Operate.as_view(),
-        name='')
+        name=''),
+    # 给业务系统提供的统计接口
+    path('application/statistics', views.Application.Statistics.as_view())
 ]

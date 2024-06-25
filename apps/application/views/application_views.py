@@ -26,6 +26,10 @@ from common.response import result
 from common.swagger_api.common_api import CommonApi
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.dataset_serializers import DataSetSerializers
+from common.db.sql_execute import select_one
+from common.util.file_util import get_file_content
+import os
+from smartdoc.conf import PROJECT_DIR
 
 
 class ApplicationStatistics(APIView):
@@ -163,7 +167,8 @@ class Application(APIView):
         def get(self, request: Request):
             return ApplicationSerializer.Embed(
                 data={'protocol': request.query_params.get('protocol'), 'token': request.query_params.get('token'),
-                      'host': request.query_params.get('host'), 'mainAccount': request.query_params.get('mainAccount')}).get_embed()
+                      'host': request.query_params.get('host'),
+                      'mainAccount': request.query_params.get('mainAccount')}).get_embed()
 
     class Model(APIView):
         authentication_classes = [TokenAuth]
@@ -457,3 +462,11 @@ class Application(APIView):
                 ApplicationSerializer.Query(
                     data={**query_params_to_single_dict(request.query_params), 'user_id': request.user.id}).page(
                     current_page, page_size))
+
+    class Statistics(APIView):
+
+        @action(methods=['GET'], detail=False)
+        def get(self):
+            data = select_one(
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'user_statistics.sql')), [])
+            return result.success(data)
