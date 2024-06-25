@@ -471,7 +471,7 @@ class Application(APIView):
                 get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'user_statistics.sql')), [])
 
             data_size = select_one(
-                get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'user_statistics.sql')), [])
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'get_database_size.sql')), [])
 
             data['resourceSize'] = data_size['database_size']
             return result.success(data)
