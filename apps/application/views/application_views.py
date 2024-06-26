@@ -473,5 +473,8 @@ class Application(APIView):
             data_size = select_one(
                 get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'get_database_size.sql')), [])
 
-            data['resourceSize'] = data_size['database_size']
-            return result.success(data)
+            res = {'resourceSize': data_size['database_size'], 'uv': data['uv'], 'pv': data['pv'],
+                   'dailyActive': data['daily_active'], 'weekActive': data['week_active'],
+                   'monthActive': data['month_active']}
+
+            return result.success(res)
