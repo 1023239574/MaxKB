@@ -22,46 +22,66 @@ monthly_pv AS (
 -- 近24小时活跃用户数
 daily_active AS (
     SELECT
-        array_agg(hour) AS x,
-        array_agg(active_users) AS y
+        array_agg(hours.hour) AS x,
+        array_agg(COALESCE(sub.active_users, 0)) AS y
     FROM (
         SELECT
-            extract(hour FROM create_time) AS hour,
-            COUNT(DISTINCT main_account) AS active_users
-        FROM application_chat
-        WHERE create_time >= now() - interval '1 day'
-        GROUP BY extract(hour FROM create_time)
-    ) sub
+            generate_series(0, 23) AS hour
+        ) hours
+        LEFT JOIN (
+            SELECT
+                extract(hour FROM create_time) AS hour,
+                COUNT(DISTINCT main_account) AS active_users
+            FROM application_chat
+            WHERE create_time >= now() - interval '1 day'
+            GROUP BY extract(hour FROM create_time)
+        ) sub ON hours.hour = sub.hour
 ),
 
 -- 近七天活跃用户数
 week_active AS (
     SELECT
-        array_agg(date::date) AS x,
-        array_agg(active_users) AS y
+        array_agg(days.date::date) AS x,
+        array_agg(COALESCE(sub.active_users, 0)) AS y
     FROM (
         SELECT
-            date_trunc('day', create_time) AS date,
-            COUNT(DISTINCT main_account) AS active_users
-        FROM application_chat
-        WHERE create_time >= now() - interval '7 days'
-        GROUP BY date_trunc('day', create_time)
-    ) sub
+            generate_series(
+                date_trunc('day', now() - interval '6 days'),
+                date_trunc('day', now()),
+                interval '1 day'
+            )::date AS date
+        ) days
+        LEFT JOIN (
+            SELECT
+                date_trunc('day', create_time)::date AS date,
+                COUNT(DISTINCT main_account) AS active_users
+            FROM application_chat
+            WHERE create_time >= now() - interval '7 days'
+            GROUP BY date_trunc('day', create_time)
+        ) sub ON days.date = sub.date
 ),
 
 -- 近30天活跃用户数
 month_active AS (
     SELECT
-        array_agg(date::date) AS x,
-        array_agg(active_users) AS y
+        array_agg(days.date::date) AS x,
+        array_agg(COALESCE(sub.active_users, 0)) AS y
     FROM (
         SELECT
-            date_trunc('day', create_time) AS date,
-            COUNT(DISTINCT main_account) AS active_users
-        FROM application_chat
-        WHERE create_time >= now() - interval '30 days'
-        GROUP BY date_trunc('day', create_time)
-    ) sub
+            generate_series(
+                date_trunc('day', now() - interval '29 days'),
+                date_trunc('day', now()),
+                interval '1 day'
+            )::date AS date
+        ) days
+        LEFT JOIN (
+            SELECT
+                date_trunc('day', create_time)::date AS date,
+                COUNT(DISTINCT main_account) AS active_users
+            FROM application_chat
+            WHERE create_time >= now() - interval '30 days'
+            GROUP BY date_trunc('day', create_time)
+        ) sub ON days.date = sub.date
 )
 
 -- 合并所有结果
