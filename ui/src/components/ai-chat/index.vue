@@ -146,7 +146,7 @@
           ref="quickInputRef"
           v-model="inputValue"
           placeholder="请输入"
-          :rows="1"
+          :rows="2"
           type="textarea"
           :maxlength="1024"
           @keydown.enter="sendChatHandle($event)"
@@ -707,6 +707,8 @@ defineExpose({
       }
       .operate {
         padding: 6px 10px;
+        display: flex;
+        align-items: center;
         .sent-button {
           max-height: none;
           .el-icon {

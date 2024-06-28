@@ -21,8 +21,9 @@
       </AiChat>
     </div>
 
-    <el-button type="primary" link class="new-chat-button" @click="newChat">
-      <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
+    <el-button type="primary" link class="new-chat-button" @click="newChat" title="新建对话">
+      <!-- <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span> -->
+       <img src="../../../assets/new.png" style="width: 26px;">
     </el-button>
     <!-- 历史记录弹出层 -->
     <div @click.prevent.stop="show = !show" class="chat-popover-button cursor color-secondary">
@@ -228,8 +229,8 @@ onMounted(() => {
   }
   .new-chat-button {
     position: absolute;
-    bottom: 80px;
-    left: 18px;
+    bottom: 60px;
+    right: 18px;
     z-index: 11;
   }
   // 历史对话弹出层
@@ -287,10 +288,12 @@ onMounted(() => {
   }
   .AiChat-embed {
     .ai-chat__operate {
-      padding-top: 38px;
+     padding-top: 15px;
+     padding-bottom: 40px;
+     padding-right: 63px;
     }
     .ai-chat__content {
-      padding-bottom: 104px
+      padding-bottom: 115px
     }
   }
 }
