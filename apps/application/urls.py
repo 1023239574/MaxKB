@@ -5,6 +5,8 @@ from . import views
 app_name = "application"
 urlpatterns = [
     path('application', views.Application.as_view(), name="application"),
+    # 给业务系统提供的统计接口
+    path('statistics', views.Application.Statistics.as_view()),
     path('application/profile', views.Application.Profile.as_view(), name='application/profile'),
     path('application/embed', views.Application.Embed.as_view()),
     path('application/authentication', views.Application.Authentication.as_view()),
