@@ -623,6 +623,11 @@ defineExpose({
   position: relative;
   color: var(--app-text-color);
   box-sizing: border-box;
+
+  .ai-chat__content {
+      padding-bottom: 120px
+   }
+  
   &.chart-log {
     .ai-chat__content {
       padding-bottom: 0;
