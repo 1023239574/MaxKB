@@ -488,7 +488,7 @@ class Application(APIView):
             end_date = request.query_params.get('end_date')
 
             data = select_one(
-                get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'user_statistics.sql')),
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'application_statistics.sql')),
                 [start_date, end_date, start_date, end_date])
 
             return result.success(data)
