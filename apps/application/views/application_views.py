@@ -478,3 +478,17 @@ class Application(APIView):
                    'monthActive': data['month_active']}
 
             return result.success(res)
+
+    class ApplicationStatistics(APIView):
+
+        @action(methods=['GET'], detail=False)
+        def get(self, request: Request):
+
+            start_date = request.query_params.get('start_date')
+            end_date = request.query_params.get('end_date')
+
+            data = select_one(
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'user_statistics.sql')),
+                [start_date, end_date, start_date, end_date])
+
+            return result.success(data)
