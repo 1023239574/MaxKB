@@ -40,8 +40,8 @@ question_stats AS (
   FROM days
   LEFT JOIN application_chat_record acr
     ON date_trunc('day', acr.create_time) = days.day
-    AND acr.create_time >= %s
-    AND acr.create_time < %s + INTERVAL '1 day'
+    AND acr.create_time >= %s::timestamp
+    AND acr.create_time < (%s::timestamp + INTERVAL '1 day')
   GROUP BY days.day
   ORDER BY days.day
 ),
