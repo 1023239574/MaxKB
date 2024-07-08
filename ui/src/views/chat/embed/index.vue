@@ -293,7 +293,7 @@ onMounted(() => {
      padding-right: 63px;
     }
     .ai-chat__content {
-      padding-bottom: 115px
+      padding-bottom: 120px
     }
   }
 }
