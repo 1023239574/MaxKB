@@ -1,5 +1,32 @@
 <template>
-  <div class="chat-pc" :class="classObj" v-loading="loading">
+  <div v-if="!isAsk" class="chat-pc-home">
+    <div class="center-box">
+      <div class="banner">
+        <img src="../../../assets/pc/banner.png">
+      </div>
+      <div class="input-box">
+        <el-input
+          v-model="inputValue"
+          placeholder="请输入您的问题"
+          :rows="1"
+          :maxlength="1024"
+          @keydown.enter="sendChatHandle($event)"
+        />
+        <img :class="inputValue? '':'disable-btn'" src="../../../assets/pc/send.png"  @click="sendChatHandle">
+      </div>
+      <div class="intro">
+        <img src="../../../assets/pc/pc-icon0.png">
+        <div>快来解锁下这些用法，大家都在问~</div>
+      </div>
+      <div class="recommend-box">
+        <div v-for="(item,index) in topQuestion" :key="index" class="recommend-item" @click="quickProblemHandle(item)">
+          <div class="icons-box"></div>
+          {{ item }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div v-else class="chat-pc" :class="classObj" v-loading="loading">
     <div class="chat-pc__header">
       <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
     </div>
@@ -79,6 +106,7 @@
             :record="currentRecordList"
             :chatId="currentChatId"
             :mainAccount = "mainAccount"
+            :quickProblem = "quickProblem"
             @refresh="refresh"
             @scroll="handleScroll"
           ></AiChat>
@@ -92,6 +120,7 @@
       </el-button>
     </div>
   </div>
+
 </template>
 <script setup lang="ts">
 import { reactive, ref, onMounted, nextTick, computed } from 'vue'
@@ -133,6 +162,10 @@ const left_loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
+const isAsk = ref(false)
+const inputValue = ref('')
+const topQuestion = ref<any[]>([])
+const quickProblem = ref()
 
 const paginationConfig = ref({
   current_page: 1,
@@ -174,6 +207,13 @@ function getProfile() {
     .getProfile(loading)
     .then((res) => {
       applicationDetail.value = res.data
+      
+      if(res.data.prologue){
+        let rows = res.data.prologue?.split('-')
+        rows.splice(0,1)
+        topQuestion.value = rows
+      }
+     
       getChatLog(applicationDetail.value.id)
     })
     .catch(() => {
@@ -262,6 +302,21 @@ function refresh(id: string) {
   currentChatId.value = id
 }
 
+function sendChatHandle(event: any) {
+  if (!event.ctrlKey) {
+    // 如果没有按下组合键ctrl，则会阻止默认事件
+    event.preventDefault()
+    quickProblem.value = inputValue.value 
+    isAsk.value = true
+  } else {
+    // 如果同时按下ctrl+回车键，则会换行
+    inputValue.value += '\n'
+  }
+}
+function quickProblemHandle(item: any){
+  quickProblem.value = item
+  isAsk.value = true
+}
 async function exportMarkdown(): Promise<void> {
   const suggestedName: string = `${currentChatId.value}.md`
   const markdownContent: string = currentRecordList.value
@@ -289,6 +344,120 @@ onMounted(() => {
 })
 </script>
 <style lang="scss">
+.chat-pc-home{
+  height: 100%;
+  width: 100%;
+  background:url('../../../assets/pc/pc-bg.png');
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+
+  .center-box{
+    width: 51%;
+    height: fit-content;
+    .banner{
+      img{
+       width: 100%;
+      }
+    }
+
+    .input-box{
+      position: relative;
+      margin: 25px 0 0 0;
+      .el-input{
+        line-height: 60px;
+        height: 60px;
+      }
+
+      .el-input__wrapper{
+        border-radius: 39px;
+        box-shadow: none;
+        padding: 1px 50px 1px 20px !important;
+      }
+
+      img{
+        position: absolute;
+        right: 20px;
+        top: 16px;
+        cursor: pointer;
+      }
+
+      .disable-btn{
+        pointer-events: none;  /* 禁止点击 */
+        cursor: not-allowed;
+        filter: grayscale(100%) opacity(40%);  /* 灰色滤镜效果 */
+      }
+    }
+
+    .intro{
+      margin-top: 6%;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      font-size: 16px;
+      color: #19191f;
+      font-family: Microsoft YaHei;
+      margin-bottom: 20px;
+
+      img{
+        margin-right: 10px;
+      }
+    }
+
+    .recommend-box{
+      .recommend-item{
+        background: #FFFFFF;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        padding: 13px 10px 13px 0px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        overflow: hidden;
+
+        &:hover{
+          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+        }
+
+        .icons-box{
+          height: 54px;
+          width: 54px;
+          margin-bottom: -28px;
+          font-family: Microsoft YaHei;
+          font-weight: 400;
+          font-size: 18px;
+          color: #0B0B0C;
+        }
+      }
+
+      
+      .recommend-item:nth-child(4n + 1) {
+        .icons-box {
+          background: url('../../../assets/pc/pc-iocn1.png');
+        }
+      }
+
+      .recommend-item:nth-child(4n + 2) {
+        .icons-box {
+          background: url('../../../assets/pc/pc-iocn2.png');
+        }
+      }
+
+      .recommend-item:nth-child(4n + 3) {
+        .icons-box {
+          background: url('../../../assets/pc/pc-iocn3.png');
+        }
+      }
+
+      .recommend-item:nth-child(4n + 4) {
+        .icons-box {
+          background: url('../../../assets/pc/pc-iocn4.png');
+        }
+      }
+    }
+  }
+}
 .chat-pc {
   background-color: var(--app-layout-bg-color);
   overflow: hidden;
