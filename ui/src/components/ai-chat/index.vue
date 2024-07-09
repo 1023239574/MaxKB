@@ -37,7 +37,7 @@
           <div class="item-content mb-16 lighter">
             <div class="avatar">
               <AppAvatar>
-                <img src="@/assets/user-icon.png" style="width: 60%;height:auto" alt="" />
+                <img src="@/assets/user-icon.png" style="width: 100%;height:auto" alt="" />
               </AppAvatar>
             </div>
             <div class="content">
