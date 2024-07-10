@@ -36,6 +36,7 @@ const menuIcon = computed(() => {
     padding: 13px 12px 13px 16px !important;
     font-weight: 500;
     border-radius: 4px;
+    color: #fff;
     &:hover {
       background: none;
       color: var(--el-menu-active-color);
@@ -43,8 +44,8 @@ const menuIcon = computed(() => {
   }
 
   .el-menu-item.is-active {
-    color: var(--el-menu-active-color);
-    background: var(--el-color-primary-light-9);
+    color: #fff;
+    background: #3C73E1;
   }
 }
 </style>

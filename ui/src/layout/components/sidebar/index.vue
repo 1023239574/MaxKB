@@ -51,6 +51,7 @@ const activeMenu = computed(() => {
   .el-menu {
     height: 100%;
     border: none;
+    background-color: #1E2B3C;
   }
 }
 </style>

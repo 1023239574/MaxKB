@@ -3,7 +3,6 @@
   <div class="top-bar-container border-b flex-between">
     <div class="flex-center h-full">
       <div class="app-title-container flex-center cursor" @click="router.push('/')">
-        <div class="app-title-icon"></div>
         <div class="app-title-text app-logo-font ml-4">
           {{ defaultTitle }}
         </div>
@@ -56,9 +55,12 @@ function toUrl(url: string) {
   height: var(--app-header-height);
   box-sizing: border-box;
   padding: var(--app-header-padding);
+  background-color: #2E3B62;
+  color: #fff;
+  padding-left: 0px;
 
   .app-title-container {
-    margin-right: 45px;
+    width: 240px;
 
     .app-title-icon {
       background-image: url('@/assets/logo.png');
@@ -69,6 +71,10 @@ function toUrl(url: string) {
 
     .app-title-text {
       font-size: 24px;
+      background: #fff;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   }
 

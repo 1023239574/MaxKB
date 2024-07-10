@@ -1,6 +1,6 @@
 <template>
   <div class="breadcrumb ml-4 mt-4 mb-12 flex">
-    <back-button :to="activeMenu" class="mt-4"></back-button>
+    <back-button :to="activeMenu" class="mt-4 white-color"></back-button>
     <el-dropdown
       placement="bottom"
       trigger="click"
@@ -8,7 +8,7 @@
       class="w-full"
       style="display: block"
     >
-      <div class="breadcrumb-hover flex-between cursor">
+      <div class="breadcrumb-hover flex-between cursor white-color">
         <div class="flex align-center">
           <AppAvatar
             v-if="isApplication && isAppIcon(current?.icon)"
@@ -214,6 +214,13 @@ onMounted(() => {
   }
 }
 .breadcrumb {
+  .white-color{
+    color: #fff;
+
+    .el-button.is-text{
+      color: #fff;
+    }
+  }
   .breadcrumb-hover {
     padding: 4px;
     border-radius: 4px;
