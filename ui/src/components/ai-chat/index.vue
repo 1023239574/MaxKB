@@ -37,7 +37,7 @@
           <div class="item-content mb-16 lighter">
             <div class="avatar">
               <AppAvatar>
-                <img src="@/assets/user-icon.png" style="width: 60%;height:auto" alt="" />
+                <img src="@/assets/user-icon.png" style="width: 100%;height:auto" alt="" />
               </AppAvatar>
             </div>
             <div class="content">
@@ -173,7 +173,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, computed, watch, reactive } from 'vue'
+import { ref, nextTick, computed, watch, reactive ,onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import LogOperationButton from './LogOperationButton.vue'
 import OperationButton from './OperationButton.vue'
@@ -211,7 +211,8 @@ const props = defineProps({
     type: String,
     default: ''
   }, // 历史记录Id
-  mainAccount: String
+  mainAccount: String,
+  quickProblem: String
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
@@ -611,6 +612,13 @@ watch(
 
 defineExpose({
   setScrollBottom
+})
+
+onMounted(() => {
+  if(props.quickProblem){
+    quickProblemHandle(props.quickProblem)
+  }
+  
 })
 </script>
 <style lang="scss" scoped>

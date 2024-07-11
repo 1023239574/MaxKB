@@ -116,6 +116,15 @@ defineExpose({ open })
     padding-bottom: 30px
   }
 }
+
+@media only screen and (max-width: 970px) {
+  .paragraph-source {
+    width: 70% !important;
+    .footer-content {
+      display: block;
+    }
+  }
+}
 @media only screen and (max-width: 768px) {
   .paragraph-source {
     width: 90% !important;

@@ -1,9 +1,10 @@
 <template>
   <el-dropdown trigger="click" type="primary">
-    <div class="flex-center cursor">
-      <AppAvatar>
+    <div class="flex-center cursor" style="color: #fff;">
+  <!--     <AppAvatar>
         <img src="@/assets/user-icon.png" style="width: 60%;height:auto" alt="" />
-      </AppAvatar>
+      </AppAvatar> -->
+      <el-icon :size="18"><UserFilled /></el-icon>
       <span class="ml-8">{{ user.userInfo?.username }}</span>
       <el-icon class="el-icon--right">
         <CaretBottom />
