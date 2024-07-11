@@ -53,7 +53,7 @@ MIDDLEWARE = [
 ]
 
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60 * 60 * 2)  # <-- 设置token有效时间
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60 * 60 * 24 * 365)  # <-- 设置token有效时间
 }
 
 ROOT_URLCONF = 'smartdoc.urls'
