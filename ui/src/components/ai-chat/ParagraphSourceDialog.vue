@@ -115,6 +115,12 @@ defineExpose({ open })
     max-height: 380px;
     padding-bottom: 30px
   }
+
+  .footer-content {
+    background-color: aliceblue;
+    padding: 0 8px;
+    border-radius: 4px;
+    }
 }
 
 @media only screen and (max-width: 970px) {
