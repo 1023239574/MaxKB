@@ -16,7 +16,7 @@
       </div>
       <div class="intro">
         <img src="../../../assets/pc/pc-icon0.png">
-        <div>快来解锁下这些用法，大家都在问~</div>
+        <div>快来了解下面这些信息，大家都在问~</div>
       </div>
       <div class="recommend-box">
         <div v-for="(item,index) in topQuestion" :key="index" class="recommend-item" @click="quickProblemHandle(item)">
@@ -368,6 +368,9 @@ onMounted(() => {
       .el-input{
         line-height: 60px;
         height: 60px;
+      }
+      .el-input__inner{
+        font-size: 18px;
       }
 
       .el-input__wrapper{
