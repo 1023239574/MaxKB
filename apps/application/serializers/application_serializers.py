@@ -629,7 +629,7 @@ class ApplicationSerializer(serializers.Serializer):
 
 class GetLawSerializer(serializers.Serializer):
     law_name = serializers.CharField(max_length=100)
-    term = serializers.CharField(min_value=100)
+    term = serializers.CharField(max_length=100)
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
