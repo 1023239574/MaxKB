@@ -625,3 +625,19 @@ class ApplicationSerializer(serializers.Serializer):
                 if 'cross_domain_list' in instance and instance.get('cross_domain_list') is not None:
                     application_api_key.cross_domain_list = instance.get('cross_domain_list')
                 application_api_key.save()
+
+
+class GetLawSerializer(serializers.Serializer):
+    law_name = serializers.CharField(max_length=100)
+    term = serializers.CharField(min_value=100)
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        application_id = self.data.get("application_id")
+        dataset_id = self.data.get('dataset_id')
+        application = QuerySet(Application).filter(id=application_id).first()
+        if application is None:
+            raise AppApiException(1001, "应用不存在")
+        dataset = QuerySet(DataSet).filter(id=dataset_id).first()
+        if dataset is None:
+            raise AppApiException(1001, "知识库不存在")

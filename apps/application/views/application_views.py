@@ -14,7 +14,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from application.serializers.application_serializers import ApplicationSerializer
+from application.serializers.application_serializers import ApplicationSerializer, GetLawSerializer
 from application.serializers.application_statistics_serializers import ApplicationStatisticsSerializer
 from application.swagger_api.application_api import ApplicationApi
 from application.swagger_api.application_statistics_api import ApplicationStatisticsApi
@@ -30,6 +30,7 @@ from common.db.sql_execute import select_one
 from common.util.file_util import get_file_content
 import os
 from smartdoc.conf import PROJECT_DIR
+import json
 
 
 class ApplicationStatistics(APIView):
@@ -492,3 +493,29 @@ class Application(APIView):
                 [start_date, end_date, start_date, end_date])
 
             return result.success(data)
+
+    class Law(APIView):
+
+        @action(methods=['POST'], detail=False)
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def post(self, request: Request, application_id: str, dataset_id: str):
+
+            params = json.loads(request.body)
+
+            if GetLawSerializer(data={'application_id': application_id, 'dataset_id': dataset_id,
+                                      'law_name': params['law_name'], 'term': params['term']}).is_valid():
+
+                data = select_one(
+                    get_file_content(
+                        os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'application_statistics.sql')),
+                    [application_id, dataset_id, params['law_name'], params['term']])
+
+                return result.success(data)
+
+            else:
+                return result.error('请求参数有误！')
+

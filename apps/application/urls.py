@@ -8,6 +8,7 @@ urlpatterns = [
     # 给业务系统提供的统计接口
     path('statistics', views.Application.Statistics.as_view()),
     path('applicationStatistics', views.Application.ApplicationStatistics.as_view()),
+    path('application/<str:application_id>/<str:dataset_id>/law', views.Application.Law.as_view()),
     path('application/profile', views.Application.Profile.as_view(), name='application/profile'),
     path('application/embed', views.Application.Embed.as_view()),
     path('application/authentication', views.Application.Authentication.as_view()),
