@@ -498,8 +498,9 @@ class Application(APIView):
 
         @action(methods=['POST'], detail=False)
         @has_permissions(ViewPermission(
-            [RoleConstants.ADMIN, RoleConstants.USER],
-            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
+            [RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN,
+             RoleConstants.APPLICATION_KEY],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
         def post(self, request: Request, application_id: str, dataset_id: str):
