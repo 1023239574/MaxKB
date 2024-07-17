@@ -630,6 +630,8 @@ class ApplicationSerializer(serializers.Serializer):
 class GetLawSerializer(serializers.Serializer):
     law_name = serializers.CharField(max_length=100)
     term = serializers.CharField(max_length=100)
+    application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+    dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -641,3 +643,5 @@ class GetLawSerializer(serializers.Serializer):
         dataset = QuerySet(DataSet).filter(id=dataset_id).first()
         if dataset is None:
             raise AppApiException(1001, "知识库不存在")
+
+        return True

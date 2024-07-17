@@ -513,7 +513,7 @@ class Application(APIView):
 
                 data = select_one(
                     get_file_content(
-                        os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'application_statistics.sql')),
+                        os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'get_law.sql')),
                     [application_id, dataset_id, params['law_name'], params['term']])
 
                 return result.success(data)
