@@ -495,6 +495,7 @@ class Application(APIView):
             return result.success(data)
 
     class Law(APIView):
+        authentication_classes = [TokenAuth]
 
         @action(methods=['POST'], detail=False)
         @has_permissions(ViewPermission(
