@@ -15,6 +15,7 @@ from rest_framework import serializers
 
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PipelineManage
+from application.chat_pipeline.step.chat_step.i_chat_step import ModelField
 from common.util.field_message import ErrMessage
 from langchain.chat_models.base import BaseChatModel
 
@@ -45,6 +46,9 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
                                       message="类型只支持register|reset_password", code=500)
         ], error_messages=ErrMessage.char("检索模式"))
 
+        # 大语言模型
+        chat_model = ModelField(required=True, error_messages=ErrMessage.base("大语言模型"))
+
     def get_step_serializer(self, manage: PipelineManage) -> Type[InstanceSerializer]:
         return self.InstanceSerializer
 
@@ -69,6 +73,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         :param exclude_paragraph_id_list:          需要排除段落id
         :param padding_problem_text                补全问题
         :param search_mode                         检索模式
+        :param chat_model                          大语言模型
         :return: 段落列表
         """
         pass
