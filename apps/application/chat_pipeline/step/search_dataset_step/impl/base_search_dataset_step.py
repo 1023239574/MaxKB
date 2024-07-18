@@ -54,7 +54,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
 
         # rag-fusion
-        response = chat_model.invoke(prompt.format_messages(original_question=exec_problem_text))
+        response = chat_model.invoke(prompt.format_messages(original_question=exec_problem_text)).content
 
         # 解析 JSON 结果
         questions = []
