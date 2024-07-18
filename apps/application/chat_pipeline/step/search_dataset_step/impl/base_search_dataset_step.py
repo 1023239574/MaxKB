@@ -19,6 +19,29 @@ from common.util.file_util import get_file_content
 from dataset.models import Paragraph
 from embedding.models import SearchMode
 from smartdoc.conf import PROJECT_DIR
+from langchain.prompts import ChatPromptTemplate
+from langchain.chat_models.base import BaseChatModel
+import json
+import logging
+import traceback
+
+
+prompt = ChatPromptTemplate.from_template("""
+
+你是一位经验丰富的煤矿安全专家和教育培训师。我会给你一个与煤矿行业相关的问题或主题。你的任务是基于这个问题，从不同角度生成 5 个相关的问题。这些问题应该涵盖安全管理、技术操作、法律法规、应急处理、环境影响等方面。
+
+请确保每个问题都与原始主题相关，但从不同的角度探讨问题。问题应该简洁明了，适合用于培训或讨论。原问题在xml标签<text></text>中。
+
+原始问题/主题是：
+<text>{original_question}</text>
+
+请生成 5 个相关问题，并以 JSON 数组的格式返回结果。格式如下：
+
+["问题1", "问题2", "问题3", "问题4", "问题5"]
+
+请严格确保输出的是有效的 JSON 格式，可以直接被解析。只返回问题数组，不要包含其他文字说明。
+
+""")
 
 
 class BaseSearchDatasetStep(ISearchDatasetStep):
@@ -26,14 +49,35 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
     def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
+                chat_model: BaseChatModel = None,
                 **kwargs) -> List[ParagraphPipelineModel]:
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
+
+        # rag-fusion
+        response = chat_model.invoke(prompt.format_messages(original_question=exec_problem_text))
+
+        # 解析 JSON 结果
+        questions = []
+        try:
+            questions = json.loads(response)
+            print(f"生成的问题：{questions}")
+        except Exception as e:
+            logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+
+        exec_problem_text_list = [exec_problem_text]
+        if len(questions) > 0:
+            exec_problem_text_list.extend(questions)
+
         embedding_model = EmbeddingModel.get_embedding_model()
-        embedding_value = embedding_model.embed_query(exec_problem_text)
         vector = VectorStore.get_embedding_vector()
-        # 默认召回topn+2个段落
-        embedding_list = vector.query(exec_problem_text, embedding_value, dataset_id_list, exclude_document_id_list,
-                                      exclude_paragraph_id_list, True, top_n+2, similarity, SearchMode(search_mode))
+
+        embedding_list = []
+        for exec_problem_text in exec_problem_text_list:
+
+            # 默认召回topn+2个段落
+            embedding_list.append(vector.query(exec_problem_text, embedding_model.embed_query(exec_problem_text),
+                                               dataset_id_list, exclude_document_id_list, exclude_paragraph_id_list,
+                                               True, top_n+2, similarity, SearchMode(search_mode)))
         if embedding_list is None:
             return []
         paragraph_list = self.list_paragraph(embedding_list, vector)

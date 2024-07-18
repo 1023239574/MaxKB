@@ -16,6 +16,7 @@ from rest_framework import serializers
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from common.util.field_message import ErrMessage
+from langchain.chat_models.base import BaseChatModel
 
 
 class ISearchDatasetStep(IBaseChatPipelineStep):
@@ -56,6 +57,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
     def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
+                chat_model: BaseChatModel = None,
                 **kwargs) -> List[ParagraphPipelineModel]:
         """
         关于 用户和补全问题 说明: 补全问题如果有就使用补全问题去查询 反之就用用户原始问题查询
