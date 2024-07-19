@@ -60,7 +60,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         questions = []
         try:
             questions = json.loads(response)
-            print(f"生成的问题：{questions}")
+            logging.getLogger("max_kb").info(f'生成的问题:{questions}')
         except Exception as e:
             logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
 
@@ -75,7 +75,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         for exec_problem_text in exec_problem_text_list:
 
             # 默认召回topn+2个段落
-            embedding_list.append(vector.query(exec_problem_text, embedding_model.embed_query(exec_problem_text),
+            embedding_list.extend(vector.query(exec_problem_text, embedding_model.embed_query(exec_problem_text),
                                                dataset_id_list, exclude_document_id_list, exclude_paragraph_id_list,
                                                True, top_n+2, similarity, SearchMode(search_mode)))
         if embedding_list is None:
