@@ -50,8 +50,8 @@ model_config = [
     },
     {
         'download_params': {
-            'urls': ["https://huggingface.co/BAAI/bge-large-zh-v1.5/tree/main"],
-            'file_save_paths': [os.path.join(prefix_dir, 'embedding', "bge-large-zh-v1.5")]
+            'urls': ["https://huggingface.co/BAAI/bge-m3/tree/main"],
+            'file_save_paths': [os.path.join(prefix_dir, 'embedding', "bge-m3")]
         },
         'download_function': hg.get_batch_data
     },

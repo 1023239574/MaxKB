@@ -82,7 +82,7 @@ class Config(dict):
         "DB_PASSWORD": "Password123@postgres",
         "DB_ENGINE": "django.db.backends.postgresql_psycopg2",
         # 向量模型
-        "EMBEDDING_MODEL_NAME": "BAAI/bge-large-zh-v1.5",
+        "EMBEDDING_MODEL_NAME": "BAAI/bge-m3",
         "EMBEDDING_DEVICE": "cpu",
         "EMBEDDING_MODEL_PATH": os.path.join(PROJECT_DIR, 'models'),
         "RERANK_MODEL_NAME": "maidalun1020/bce-embedding-base_v1",
