@@ -88,10 +88,9 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
 
         # 重排序
         rerank_model = RerankModel.get_rerank_model()
-        rerank_index = rerank_model.rerank(exec_problem_text, [f'{paragraph.title}:{paragraph.content}' for paragraph in result]).get('rerank_ids')
-        rerank_result = [result[index] for index in rerank_index][:top_n]
+        rerank_scores = rerank_model.rerank([[exec_problem_text, f'{paragraph.title}:{paragraph.content}'] for paragraph in result])
 
-        return rerank_result
+        return [item[0] for item in sorted(zip(result, rerank_scores), key=lambda x: x[1], reverse=True)[:top_n]]
 
     @staticmethod
     def reset_paragraph(paragraph: Dict, embedding_list: List) -> ParagraphPipelineModel:

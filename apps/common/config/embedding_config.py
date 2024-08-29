@@ -7,7 +7,7 @@
     @desc:
 """
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from BCEmbedding import RerankerModel
+from FlagEmbedding import FlagReranker
 
 from smartdoc.const import CONFIG
 
@@ -64,6 +64,6 @@ class RerankModel:
         if RerankModel.instance is None:
             model_name = CONFIG.get('RERANK_MODEL_NAME')
             device = CONFIG.get('RERANK_DEVICE')
-            e = RerankerModel(model_name_or_path=model_name, device=device)
+            e = FlagReranker(model_name_or_path=model_name, device=device, use_fp16=True)
             RerankModel.instance = e
         return RerankModel.instance

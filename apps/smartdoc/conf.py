@@ -85,7 +85,7 @@ class Config(dict):
         "EMBEDDING_MODEL_NAME": "BAAI/bge-m3",
         "EMBEDDING_DEVICE": "cpu",
         "EMBEDDING_MODEL_PATH": os.path.join(PROJECT_DIR, 'models'),
-        "RERANK_MODEL_NAME": "maidalun1020/bce-embedding-base_v1",
+        "RERANK_MODEL_NAME": "BAAI/bge-reranker-v2-m3",
         "RERANK_DEVICE": "cpu",
         # 向量库配置
         "VECTOR_STORE_NAME": 'pg_vector',

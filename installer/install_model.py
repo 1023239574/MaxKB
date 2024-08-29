@@ -57,8 +57,8 @@ model_config = [
     },
     {
         'download_params': {
-            'urls': ["https://huggingface.co/maidalun1020/bce-reranker-base_v1/tree/main"],
-            'file_save_paths': [os.path.join(prefix_dir, 'embedding', "bce-rerank-base_v1")]
+            'urls': ["https://huggingface.co/BAAI/bge-reranker-v2-m3/tree/main"],
+            'file_save_paths': [os.path.join(prefix_dir, 'embedding', "bge-reranker-v2-m3")]
         },
         'download_function': hg.get_batch_data
     }

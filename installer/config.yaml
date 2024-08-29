@@ -16,7 +16,7 @@ DB_PASSWORD: Password123@postgres
 DB_ENGINE: django.db.backends.postgresql_psycopg2
 EMBEDDING_MODEL_PATH: /opt/maxkb/model/embedding
 EMBEDDING_MODEL_NAME: /opt/maxkb/model/embedding/bge-m3
-RERANK_MODEL_NAME: /opt/maxkb/model/embedding/bce-rerank-base_v1
+RERANK_MODEL_NAME: /opt/maxkb/model/embedding/bge-reranker-v2-m3
 #EMBEDDING_DEVICE: 0
 
 DEBUG: false
