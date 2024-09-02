@@ -7,6 +7,7 @@ urlpatterns = [
     path('dataset', views.Dataset.as_view(), name="dataset"),
     path('dataset/web', views.Dataset.CreateWebDataset.as_view()),
     path('dataset/qa', views.Dataset.CreateQADataset.as_view()),
+    path('dataset/countDocumentType', views.Dataset.CountDocumentType.as_view()),
     path('dataset/<str:dataset_id>', views.Dataset.Operate.as_view(), name="dataset_key"),
     path('dataset/<str:dataset_id>/export', views.Dataset.Export.as_view(), name="export"),
     path('dataset/<str:dataset_id>/re_embedding', views.Dataset.Embedding.as_view(), name="dataset_key"),

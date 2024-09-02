@@ -27,6 +27,11 @@ class Type(models.TextChoices):
     web = 1, 'web站点类型'
 
 
+class DocumentType(models.TextChoices):
+    base = 0, '其他'
+    # 等待补充其他类型
+
+
 class HitHandlingMethod(models.TextChoices):
     optimization = 'optimization', '模型优化'
     directly_return = 'directly_return', '直接返回'
@@ -42,6 +47,8 @@ class DataSet(AppModelMixin):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="所属用户")
     type = models.CharField(verbose_name='类型', max_length=1, choices=Type.choices,
                             default=Type.base)
+    doc_type = models.CharField(verbose_name='文档类型', max_length=1, choices=DocumentType.choices,
+                                default=DocumentType.base)
 
     meta = models.JSONField(verbose_name="元数据", default=dict)
 

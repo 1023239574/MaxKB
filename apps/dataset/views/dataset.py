@@ -20,6 +20,11 @@ from common.response import result
 from common.response.result import get_page_request_params, get_page_api_response, get_api_response
 from common.swagger_api.common_api import CommonApi
 from dataset.serializers.dataset_serializers import DataSetSerializers
+from dataset.models.data_set import DocumentType
+from common.db.sql_execute import select_list
+from common.util.file_util import get_file_content
+from smartdoc.conf import PROJECT_DIR
+import os
 
 
 class Dataset(APIView):
@@ -63,7 +68,8 @@ class Dataset(APIView):
             return result.success(DataSetSerializers.Create(data={'user_id': request.user.id}).save_qa({
                 'file_list': request.FILES.getlist('file'),
                 'name': request.data.get('name'),
-                'desc': request.data.get('desc')
+                'desc': request.data.get('desc'),
+                'docType': request.data.get('docType')
             }))
 
     class CreateWebDataset(APIView):
@@ -221,6 +227,21 @@ class Dataset(APIView):
         def get(self, request: Request, current_page, page_size):
             d = DataSetSerializers.Query(
                 data={'name': request.query_params.get('name', None), 'desc': request.query_params.get("desc", None),
-                      'user_id': str(request.user.id)})
+                      'doc_type': request.query_params.get('docType', None), 'user_id': str(request.user.id)})
             d.is_valid()
             return result.success(d.page(current_page, page_size))
+
+    class CountDocumentType(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @has_permissions(PermissionConstants.DATASET_READ, compare=CompareConstants.AND)
+        def get(self, request: Request):
+            data = select_list(
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'count_document_type.sql')), [])
+
+            data = map(lambda row: {'doc_type_name': next((label for val, label in DocumentType.choices if val == row['doc_type']), None),
+                                    'doc_type': row['doc_type'], 'count': row['count']}, data)
+
+            return result.success(data)
+

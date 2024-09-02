@@ -68,7 +68,7 @@ from smartdoc.conf import PROJECT_DIR
 class DataSetSerializers(serializers.ModelSerializer):
     class Meta:
         model = DataSet
-        fields = ['id', 'name', 'desc', 'meta', 'create_time', 'update_time']
+        fields = ['id', 'name', 'desc', 'doc_type', 'meta', 'create_time', 'update_time']
 
     class Application(ApiMixin, serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("用户id"))
@@ -127,18 +127,26 @@ class DataSetSerializers(serializers.ModelSerializer):
                                      min_length=1,
                                      )
 
+        doc_type = serializers.CharField(required=False,
+                                         error_messages=ErrMessage.char("文档类型"),
+                                         max_length=1,
+                                         min_length=1,
+                                         )
+
         user_id = serializers.CharField(required=True)
 
         def get_query_set(self):
             user_id = self.data.get("user_id")
             query_set_dict = {}
             query_set = QuerySet(model=get_dynamics_model(
-                {'temp.name': models.CharField(), 'temp.desc': models.CharField(),
+                {'temp.name': models.CharField(), 'temp.desc': models.CharField(), 'temp.doc_type': models.CharField(),
                  "document_temp.char_length": models.IntegerField(), 'temp.create_time': models.DateTimeField()}))
             if "desc" in self.data and self.data.get('desc') is not None:
                 query_set = query_set.filter(**{'temp.desc__icontains': self.data.get("desc")})
             if "name" in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'temp.name__icontains': self.data.get("name")})
+            if "doc_type" in self.data and self.data.get('doc_type') is not None:
+                query_set = query_set.filter(**{'temp.doc_type': self.data.get("doc_type")})
             query_set = query_set.order_by("-temp.create_time")
             query_set_dict['default_sql'] = query_set
 
@@ -365,7 +373,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 self.CreateQASerializers(data=instance).is_valid()
             file_list = instance.get('file_list')
             document_list = flat_map([DocumentSerializers.Create.parse_qa_file(file) for file in file_list])
-            dataset_instance = {'name': instance.get('name'), 'desc': instance.get('desc'), 'documents': document_list}
+            dataset_instance = {'name': instance.get('name'), 'desc': instance.get('desc'),
+                                'doc_type': instance.get('docType'), 'documents': document_list}
             return self.save(dataset_instance, with_valid=True)
 
         @post(post_function=post_embedding_dataset)
@@ -379,7 +388,8 @@ class DataSetSerializers(serializers.ModelSerializer):
             if QuerySet(DataSet).filter(user_id=user_id, name=instance.get('name')).exists():
                 raise AppApiException(500, "知识库名称重复!")
             dataset = DataSet(
-                **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id})
+                **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'),
+                   'doc_type': instance.get('docType'), 'user_id': user_id})
 
             document_model_list = []
             paragraph_model_list = []
@@ -451,6 +461,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
                    'type': Type.web,
+                   'doc_type': instance.get('docType'),
                    'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector')}})
             dataset.save()
             ListenerManagement.sync_web_dataset_signal.send(
