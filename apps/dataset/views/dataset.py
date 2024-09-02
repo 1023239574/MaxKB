@@ -240,8 +240,8 @@ class Dataset(APIView):
             data = select_list(
                 get_file_content(os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'count_document_type.sql')), [])
 
-            data = map(lambda row: {'doc_type_name': next((label for val, label in DocumentType.choices if val == row['doc_type']), None),
-                                    'doc_type': row['doc_type'], 'count': row['count']}, data)
+            data = list(map(lambda row: {'doc_type_name': next((label for val, label in DocumentType.choices if val == row['doc_type']), None),
+                                    'doc_type': row['doc_type'], 'count': row['count']}, data))
 
             return result.success(data)
 
