@@ -214,6 +214,12 @@ class DataSetSerializers(serializers.ModelSerializer):
                                          max_length=256,
                                          min_length=1)
 
+            doc_type = serializers.CharField(required=True,
+                                             error_messages=ErrMessage.char("文档类型"),
+                                             max_length=1,
+                                             min_length=1,
+                                             )
+
             documents = DocumentInstanceSerializer(required=False, many=True)
 
             def is_valid(self, *, raise_exception=False):
