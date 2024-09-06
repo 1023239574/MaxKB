@@ -64,9 +64,18 @@ class GenericModel(models.Model):
 
     @staticmethod
     def dynamic_query_paginated(table_name, fields, params, page_number, items_per_page):
+
+        query_params = ''
+        if params is not None:
+            if isinstance(params, dict) and len(params) > 0:
+                query_params = 'where 1=1'
+                for k, v in params.items():
+                    v = f"'{v}'" if isinstance(v, str) else v
+                    query_params += f' and {k}={v}'
+
         # 获取总记录数
         with conn.cursor() as cursor:
-            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name} {query_params}")
             total_items = cursor.fetchone()[0]
 
         # 计算偏移量
@@ -78,13 +87,6 @@ class GenericModel(models.Model):
                 query_field = fields
             elif isinstance(fields, list):
                 query_field = ','.join(fields)
-
-        query_params = ''
-        if params is not None:
-            if isinstance(params, dict) and len(dict) > 0:
-                query_params = 'where 1=1'
-                for k, v in params.items():
-                    query_params += f' and {k}={v}'
 
         # 执行分页查询
         query = f'SELECT {query_field} FROM {table_name} {query_params} LIMIT {items_per_page} OFFSET {offset}'
