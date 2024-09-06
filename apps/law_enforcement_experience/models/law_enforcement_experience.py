@@ -73,7 +73,7 @@ class GenericModel(models.Model):
         offset = (page_number - 1) * items_per_page
 
         query_field = "*"
-        if fields:
+        if fields is not None:
             if isinstance(fields, str):
                 query_field = fields
             elif isinstance(fields, list):

@@ -26,7 +26,7 @@ class LawEnforcementExperience(APIView):
             return result.success(result.Page(total=0, records=[], current_page=current_page, page_size=page_size))
 
         # 从dataset和字段名称的映射表中获取应该查询哪些字段
-        fields = FieldNameMapping.objects.filter(dataset=dataset_id).values_list('field')
+        fields = list(FieldNameMapping.objects.filter(dataset=dataset_id).values_list('field', flat=True))
 
         # 分页查询对应的表
         page = GenericModel.dynamic_query_paginated(table_name, fields, current_page, page_size)
