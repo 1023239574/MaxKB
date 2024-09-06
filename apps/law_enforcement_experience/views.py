@@ -29,6 +29,6 @@ class LawEnforcementExperience(APIView):
         fields = list(FieldNameMapping.objects.filter(dataset=dataset_id).values_list('field', flat=True))
 
         # 分页查询对应的表
-        page = GenericModel.dynamic_query_paginated(table_name, fields, current_page, page_size)
+        page = GenericModel.dynamic_query_paginated(table_name, fields, {'dataset_id': dataset_id}, current_page, page_size)
 
         return result.success(page)

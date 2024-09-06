@@ -63,7 +63,7 @@ class GenericModel(models.Model):
         managed = False
 
     @staticmethod
-    def dynamic_query_paginated(table_name, fields, page_number, items_per_page):
+    def dynamic_query_paginated(table_name, fields, params, page_number, items_per_page):
         # 获取总记录数
         with conn.cursor() as cursor:
             cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
@@ -79,8 +79,15 @@ class GenericModel(models.Model):
             elif isinstance(fields, list):
                 query_field = ','.join(fields)
 
+        query_params = ''
+        if params is not None:
+            if isinstance(params, dict) and len(dict) > 0:
+                query_params = 'where 1=1'
+                for k, v in params.items():
+                    query_params += f' and {k}={v}'
+
         # 执行分页查询
-        query = f'SELECT {query_field} FROM {table_name} LIMIT {items_per_page} OFFSET {offset}'
+        query = f'SELECT {query_field} FROM {table_name} {query_params} LIMIT {items_per_page} OFFSET {offset}'
 
         with conn.cursor() as cursor:
             cursor.execute(query)
