@@ -10,18 +10,35 @@ class Migration(migrations.Migration):
 
     operations = [migrations.RunSQL(
             sql="""
-            CREATE OR REPLACE FUNCTION count_records(table_name text)
-            RETURNS bigint AS $$
-            DECLARE
-                result bigint;
-            BEGIN
-                EXECUTE 'SELECT COUNT(*) FROM ' || quote_ident(table_name) INTO result;
-                RETURN result;
-            EXCEPTION
-                WHEN OTHERS THEN
-                    RETURN 0;
-            END;
-            $$ LANGUAGE plpgsql;
+                CREATE OR REPLACE FUNCTION count_records(p_dataset_id uuid)
+                RETURNS bigint AS $$
+                DECLARE
+                    result bigint := 0;
+                    table_name text;
+                    query text;
+                BEGIN
+                    -- 获取与 dataset_id 对应的表名
+                    SELECT dtm.table_name 
+                    INTO table_name
+                    FROM dataset_table_mapping dtm 
+                    WHERE dtm.dataset_id = p_dataset_id;
+                
+                    IF table_name IS NOT NULL THEN
+                        -- 构造包含 dataset_id 条件的查询
+                        query := 'SELECT COUNT(*) FROM ' || quote_ident(table_name) || 
+                                 ' WHERE dataset_id = $1';
+                        
+                        -- 执行计数查询
+                        EXECUTE query INTO result USING p_dataset_id;
+                    END IF;
+                
+                    RETURN COALESCE(result, 0);
+                EXCEPTION
+                    WHEN OTHERS THEN
+                        RAISE NOTICE 'Error in count_records for dataset_id %: %', p_dataset_id, SQLERRM;
+                        RETURN 0;
+                END;
+                $$ LANGUAGE plpgsql;
             """,
             reverse_sql="DROP FUNCTION IF EXISTS count_records(text);"
         ),
