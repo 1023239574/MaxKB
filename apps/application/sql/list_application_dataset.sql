@@ -3,7 +3,7 @@ SELECT
 FROM
 	dataset
 WHERE
-	user_id = %s and doc_type != 2 UNION
+	user_id = %s and doc_type != '2' UNION
 SELECT
 	*
 FROM
