@@ -29,7 +29,8 @@ class Type(models.TextChoices):
 
 class DocumentType(models.TextChoices):
     base = 0, '其他'
-    # 等待补充其他类型
+    law = 1, '法律法规'
+    law_enforcement_experience = 2, '执法经验'
 
 
 class HitHandlingMethod(models.TextChoices):

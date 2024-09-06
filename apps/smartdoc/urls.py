@@ -31,7 +31,9 @@ urlpatterns = [
     path("api/", include("users.urls")),
     path("api/", include("dataset.urls")),
     path("api/", include("setting.urls")),
-    path("api/", include("application.urls"))
+    path("api/", include("application.urls")),
+
+    path("api/", include("law_enforcement_experience.urls"))
 ]
 
 

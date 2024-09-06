@@ -24,6 +24,7 @@ from dataset.models.data_set import DocumentType
 from common.db.sql_execute import select_list
 from common.util.file_util import get_file_content
 from smartdoc.conf import PROJECT_DIR
+from law_enforcement_experience.models.law_enforcement_experience import FieldNameMapping
 import os
 
 
@@ -240,8 +241,18 @@ class Dataset(APIView):
             data = select_list(
                 get_file_content(os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'count_document_type.sql')), [])
 
-            data = list(map(lambda row: {'doc_type_name': next((label for val, label in DocumentType.choices if val == row['doc_type']), None),
-                                    'doc_type': row['doc_type'], 'count': row['count']}, data))
+            data = list(map(lambda row: {
+                'doc_type_name': next((label for val, label in DocumentType.choices if val == row['doc_type']), None),
+                'doc_type': row['doc_type'], 'count': row['count']}, data))
 
             return result.success(data)
 
+    class DatasetField(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @has_permissions(PermissionConstants.DATASET_READ, compare=CompareConstants.AND)
+        def get(self, request: Request, dataset_id: str):
+            mappings = FieldNameMapping.objects.filter(dataset=dataset_id).values('name', 'field')
+
+            return result.success(mappings)
