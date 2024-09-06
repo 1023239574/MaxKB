@@ -4,6 +4,8 @@ from dataset.models import DataSet
 import uuid
 from django.db import connection as conn
 from django.core.paginator import Paginator
+from common.response.result import Page
+from django.forms.models import model_to_dict
 
 
 class VectorField(models.Field):
@@ -84,10 +86,9 @@ class GenericModel(models.Model):
         query = f'SELECT {query_field} FROM {table_name} LIMIT {items_per_page} OFFSET {offset}'
         results = GenericModel.objects.raw(query)
 
-        # 创建一个自定义的可迭代对象，用于Paginator
         class ResultIterator:
             def __init__(self, results, total):
-                self.results = results
+                self.results = list(results)  # 转换为列表
                 self.total = total
 
             def __len__(self):
@@ -96,10 +97,14 @@ class GenericModel(models.Model):
             def __iter__(self):
                 return iter(self.results)
 
+            def __getitem__(self, index):
+                return self.results[index]
+
         result_iterator = ResultIterator(results, total_items)
 
         # 创建Paginator对象
         paginator = Paginator(result_iterator, items_per_page)
         page = paginator.get_page(page_number)
 
-        return page
+        return Page(total=page.paginator.count, records=[model_to_dict(record) for record in list(page.object_list)],
+                    current_page=page.number, page_size=page.paginator.num_pages)

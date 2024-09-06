@@ -30,10 +30,3 @@ class LawEnforcementExperience(APIView):
         page = GenericModel.dynamic_query_paginated(table_name, fields, current_page, page_size)
 
         return result.success(page)
-
-
-
-
-
-
-
