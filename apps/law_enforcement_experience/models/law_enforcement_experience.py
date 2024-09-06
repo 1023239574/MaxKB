@@ -3,9 +3,6 @@ from common.mixins.app_model_mixin import AppModelMixin
 from dataset.models import DataSet
 import uuid
 from django.db import connection as conn
-from django.core.paginator import Paginator
-from common.response.result import Page
-from django.forms.models import model_to_dict
 
 
 class VectorField(models.Field):
@@ -76,35 +73,23 @@ class GenericModel(models.Model):
         offset = (page_number - 1) * items_per_page
 
         query_field = "*"
-        if fields is not None:
-            if type(fields) == 'str':
+        if fields:
+            if isinstance(fields, str):
                 query_field = fields
-            elif type(fields) == 'list':
+            elif isinstance(fields, list):
                 query_field = ','.join(fields)
 
         # 执行分页查询
         query = f'SELECT {query_field} FROM {table_name} LIMIT {items_per_page} OFFSET {offset}'
-        results = GenericModel.objects.raw(query)
 
-        class ResultIterator:
-            def __init__(self, results, total):
-                self.results = list(results)  # 转换为列表
-                self.total = total
+        with conn.cursor() as cursor:
+            cursor.execute(query)
+            columns = [col[0] for col in cursor.description]
+            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
-            def __len__(self):
-                return self.total
-
-            def __iter__(self):
-                return iter(self.results)
-
-            def __getitem__(self, index):
-                return self.results[index]
-
-        result_iterator = ResultIterator(results, total_items)
-
-        # 创建Paginator对象
-        paginator = Paginator(result_iterator, items_per_page)
-        page = paginator.get_page(page_number)
-
-        return Page(total=page.paginator.count, records=[model_to_dict(record) for record in list(page.object_list)],
-                    current_page=page.number, page_size=page.paginator.num_pages)
+        return {
+            "total": total_items,
+            "records": results,
+            "current": page_number,
+            "size": items_per_page
+        }

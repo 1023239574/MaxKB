@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from common.auth import TokenAuth, has_permissions
@@ -22,6 +21,9 @@ class LawEnforcementExperience(APIView):
 
         # 从dataset和tableName的映射表中获取应该查询哪张表
         table_name = DatasetTableMapping.objects.get(dataset=dataset_id).table_name
+
+        if table_name is None or table_name == '':
+            return result.success(result.Page(total=0, records=[], current_page=current_page, page_size=page_size))
 
         # 从dataset和字段名称的映射表中获取应该查询哪些字段
         fields = FieldNameMapping.objects.filter(dataset=dataset_id).values_list('field')
