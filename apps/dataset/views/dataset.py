@@ -25,6 +25,7 @@ from common.db.sql_execute import select_list
 from common.util.file_util import get_file_content
 from smartdoc.conf import PROJECT_DIR
 from law_enforcement_experience.models.law_enforcement_experience import FieldNameMapping
+from django.forms.models import model_to_dict
 import os
 
 
@@ -255,4 +256,4 @@ class Dataset(APIView):
         def get(self, request: Request, dataset_id: str):
             mappings = FieldNameMapping.objects.filter(dataset=dataset_id).values('name', 'field')
 
-            return result.success(mappings)
+            return result.success(list(mappings))
