@@ -380,7 +380,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             file_list = instance.get('file_list')
             document_list = flat_map([DocumentSerializers.Create.parse_qa_file(file) for file in file_list])
             dataset_instance = {'name': instance.get('name'), 'desc': instance.get('desc'),
-                                'doc_type': instance.get('docType'), 'documents': document_list}
+                                'doc_type': instance.get('doc_type'), 'documents': document_list}
             return self.save(dataset_instance, with_valid=True)
 
         @post(post_function=post_embedding_dataset)
@@ -395,7 +395,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                 raise AppApiException(500, "知识库名称重复!")
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'),
-                   'doc_type': instance.get('docType'), 'user_id': user_id})
+                   'doc_type': instance.get('doc_type'), 'user_id': user_id})
 
             document_model_list = []
             paragraph_model_list = []
@@ -467,7 +467,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
                    'type': Type.web,
-                   'doc_type': instance.get('docType'),
+                   'doc_type': instance.get('doc_type'),
                    'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector')}})
             dataset.save()
             ListenerManagement.sync_web_dataset_signal.send(
@@ -518,7 +518,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
                     'documents': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档数据", description="文档数据",
                                                 items=DocumentSerializers().Create.get_request_body_api()
-                                                )
+                                                ),
+                    'doc_type': openapi.Schema(type=openapi.TYPE_STRING, title="文档类型", description="文档类型"),
                 }
             )
 

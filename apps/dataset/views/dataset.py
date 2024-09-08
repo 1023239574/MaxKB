@@ -70,7 +70,7 @@ class Dataset(APIView):
                 'file_list': request.FILES.getlist('file'),
                 'name': request.data.get('name'),
                 'desc': request.data.get('desc'),
-                'docType': request.data.get('docType')
+                'doc_type': request.data.get('doc_type')
             }))
 
     class CreateWebDataset(APIView):
@@ -228,7 +228,7 @@ class Dataset(APIView):
         def get(self, request: Request, current_page, page_size):
             d = DataSetSerializers.Query(
                 data={'name': request.query_params.get('name', None), 'desc': request.query_params.get("desc", None),
-                      'doc_type': request.query_params.get('docType', None), 'user_id': str(request.user.id)})
+                      'doc_type': request.query_params.get('doc_type', None), 'user_id': str(request.user.id)})
             d.is_valid()
             return result.success(d.page(current_page, page_size))
 
