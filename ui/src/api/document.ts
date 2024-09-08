@@ -277,6 +277,29 @@ const exportDocument: (
     loading
   )
 }
+const getDocumentTableData: (
+  dataset_id: string,
+  page: pageRequest,
+  param: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, page, param, loading) => {
+  return get(
+    `${prefix}/${dataset_id}/law_enforcement_experience/${page.current_page}/${page.page_size}`,
+    param,
+    loading
+  )
+}
+const getDocumentTableColumn: (
+  dataset_id: string,
+  param: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, param, loading) => {
+  return get(
+    `${prefix}/${dataset_id}/fields`,
+    param,
+    loading
+  )
+}
 
 export default {
   postSplitDocument,
@@ -296,5 +319,7 @@ export default {
   batchEditHitHandling,
   exportQATemplate,
   postQADocument,
-  exportDocument
+  exportDocument,
+  getDocumentTableData,
+  getDocumentTableColumn
 }

@@ -9,7 +9,7 @@ import router from '@/router'
 import { ref, type WritableComputedRef } from 'vue'
 
 const axiosConfig = {
-  baseURL: '/damage_gpu/api',
+  baseURL:import.meta.env.MODE === 'development'? '/test/damage_gpu/api':'/damage_gpu/api',
   withCredentials: false,
   timeout: 60000,
   headers: {}

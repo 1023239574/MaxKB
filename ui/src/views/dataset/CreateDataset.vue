@@ -57,6 +57,7 @@ const {
   params: { type },
   query: { id } // id为datasetID，有id的是上传文档
 } = route
+const doc_type = route.query.doc_type as string
 const isCreate = type === 'create'
 // const steps = [
 //   {
@@ -137,7 +138,7 @@ function submit() {
       paragraphs: item.content
     })
   })
-  const obj = { ...baseInfo.value, documents } as datasetData
+  const obj = { ...baseInfo.value, documents ,doc_type} as datasetData
   if (id) {
     // 上传文档
     document

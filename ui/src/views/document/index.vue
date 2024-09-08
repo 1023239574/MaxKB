@@ -3,7 +3,7 @@
     <div class="main-calc-height">
       <div class="p-24">
         <div class="flex-between">
-          <div>
+          <div style="display: none;">
             <el-button
               v-if="datasetDetail.type === '0'"
               type="primary"
@@ -57,6 +57,18 @@
           :row-key="(row: any) => row.id"
           :storeKey="storeKey"
         >
+          <!-- <el-table-column :prop="crime" label="文件名称" min-width="280" v-for="(i,index) in tableColumnData" :key="index"> </el-table-column> -->
+         <template v-if="doc_type=='2'">
+          <el-table-column
+            :prop="i.field"
+            :label="i.name"
+            min-width="280"
+            v-for="i in tableColumnData"
+            :key="i.field"
+          >
+          </el-table-column>
+         </template>
+         <template v-else>
           <el-table-column type="selection" width="55" :reserve-selection="true" />
           <el-table-column prop="name" label="文件名称" min-width="280">
             <template #default="{ row }">
@@ -139,8 +151,8 @@
             <template #default="{ row }">
               {{ datetimeFormat(row.update_time) }}
             </template>
-          </el-table-column>
-          <el-table-column label="操作" align="left" width="110">
+          </el-table-column> 
+         <el-table-column label="操作" align="left" width="110">
             <template #default="{ row }">
               <div v-if="datasetDetail.type === '0'">
                 <span class="mr-4">
@@ -217,7 +229,8 @@
                 </span>
               </div>
             </template>
-          </el-table-column>
+          </el-table-column> 
+         </template>
         </app-table>
       </div>
       <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
@@ -245,6 +258,7 @@ const route = useRoute()
 const {
   params: { id } // id为datasetID
 } = route as any
+const doc_type = route.query.doc_type as string
 
 const { common, dataset, document } = useStore()
 
@@ -289,6 +303,8 @@ const multipleSelection = ref<any[]>([])
 const title = ref('')
 
 const SelectDatasetDialogRef = ref()
+
+const tableColumnData = ref<any[]>([])
 const exportDocument = (document: any) => {
   documentApi.exportDocument(document.name, document.dataset_id, document.id, loading).then(() => {
     MsgSuccess('导出成功')
@@ -498,13 +514,24 @@ function getList(bool?: boolean) {
   const param = {
     ...(filterText.value && { name: filterText.value }),
     ...(filterMethod.value && { hit_handling_method: filterMethod.value })
-  }
+  }  
+  if(doc_type=='2'){
+    documentApi
+    .getDocumentTableData(id as string, paginationConfig.value, param, bool ? undefined : loading)
+    .then((res) => {
+      documentData.value = res.data.records
+      paginationConfig.value.total = res.data.total
+      console.log('表内容', documentData.value)
+    })
+  }else{
   documentApi
     .getDocument(id as string, paginationConfig.value, param, bool ? undefined : loading)
     .then((res) => {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total
     })
+  }
+
 }
 
 function getDetail() {
@@ -523,6 +550,14 @@ function refresh() {
   getList()
 }
 
+function getDocumentData() {
+  documentApi.getDocumentTableColumn(id as string, {}, loading).then((res) => {
+    console.log('表头', res)
+    tableColumnData.value = res.data || []
+    getList()
+  })
+}
+
 onMounted(() => {
   getDetail()
   if (beforePagination.value) {
@@ -532,9 +567,13 @@ onMounted(() => {
     filterText.value = beforeSearch.value['filterText']
     filterMethod.value = beforeSearch.value['filterMethod']
   }
-  getList()
   // 初始化定时任务
   initInterval()
+  if(doc_type=='2'){
+    getDocumentData()
+  }else{
+    getList()
+  }
 })
 
 onBeforeUnmount(() => {

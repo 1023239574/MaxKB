@@ -201,6 +201,10 @@ const exportDataset: (
   return exportExcel(dataset_name + '.xls', `dataset/${dataset_id}/export`, undefined, loading)
 }
 
+  const getDoctype: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
+    return get(`${prefix}/countDocumentType`, undefined, loading)
+  }
+
 export default {
   getDataset,
   getAllDataset,
@@ -214,5 +218,6 @@ export default {
   putSyncWebDataset,
   putReEmbeddingDataset,
   postQADataset,
-  exportDataset
+  exportDataset,
+  getDoctype
 }
