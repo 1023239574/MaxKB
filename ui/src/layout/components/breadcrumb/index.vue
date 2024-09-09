@@ -99,10 +99,10 @@
                   </el-button>
                 </div>
               </template>
-              <template v-else-if="isDataset">
+              <template v-else-if="isDataset && route.query.doc_type!=='2'">
                 <div
                   class="w-full text-left cursor"
-                  @click="router.push({ path: '/dataset/create' })"
+                  @click="router.push({ path: '/dataset/create' ,query:{doc_type:route.query.doc_type}})"
                 >
                   <el-button link>
                     <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
@@ -127,7 +127,7 @@ const route = useRoute()
 const router = useRouter()
 const {
   meta: { activeMenu },
-  params: { id }
+  params: { id },
 } = route
 
 onBeforeRouteLeave((to, from) => {
