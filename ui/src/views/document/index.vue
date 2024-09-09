@@ -45,7 +45,7 @@
           class="mt-16"
           :data="documentData"
           :pagination-config="paginationConfig"
-          :quick-create="datasetDetail.type === '0'"
+          :quick-create="datasetDetail.type === '0' && doc_type!=='2'"
           @sizeChange="handleSizeChange"
           @changePage="getList"
           @cell-mouse-enter="cellMouseEnter"
@@ -521,7 +521,6 @@ function getList(bool?: boolean) {
     .then((res) => {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total
-      console.log('表内容', documentData.value)
     })
   }else{
   documentApi
@@ -552,7 +551,6 @@ function refresh() {
 
 function getDocumentData() {
   documentApi.getDocumentTableColumn(id as string, {}, loading).then((res) => {
-    console.log('表头', res)
     tableColumnData.value = res.data || []
     getList()
   })

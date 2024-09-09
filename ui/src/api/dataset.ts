@@ -29,8 +29,8 @@ const getDataset: (
  * 获取全部知识库
  * @param 参数
  */
-const getAllDataset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
-  return get(`${prefix}`, undefined, loading)
+const getAllDataset: (loading?: Ref<boolean>,param?: any,) => Promise<Result<any[]>> = (loading,param) => {
+  return get(`${prefix}`, param, loading)
 }
 
 /**

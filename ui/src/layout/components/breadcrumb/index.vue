@@ -163,14 +163,14 @@ const isDataset = computed(() => {
 function changeMenu(id: string) {
   const lastMatched = route.matched[route.matched.length - 1]
   if (lastMatched) {
-    router.push({ name: lastMatched.name, params: { id: id } })
+    router.push({ name: lastMatched.name, params: { id: id } ,query:{ ...route.query }})
   }
 }
 
 function getDataset() {
   loading.value = true
   dataset
-    .asyncGetAllDataset()
+    .asyncGetAllDataset(undefined,route.query.doc_type &&{doc_type:route.query.doc_type})
     .then((res: any) => {
       list.value = res.data
       common.saveBreadcrumb(list.value)

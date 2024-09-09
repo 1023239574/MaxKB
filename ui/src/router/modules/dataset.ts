@@ -45,7 +45,8 @@ const datasetRouter = {
             title: '问题',
             active: 'problem',
             parentPath: '/dataset/:id',
-            parentName: 'DatasetDetail'
+            parentName: 'DatasetDetail',
+            hiddenDoc_type:'2'
           },
           component: () => import('@/views/problem/index.vue')
         },
@@ -57,7 +58,8 @@ const datasetRouter = {
             title: '命中测试',
             active: 'hit-test',
             parentPath: '/dataset/:id',
-            parentName: 'DatasetDetail'
+            parentName: 'DatasetDetail',
+            hiddenDoc_type:'2'
           },
           component: () => import('@/views/hit-test/index.vue')
         },
@@ -70,7 +72,8 @@ const datasetRouter = {
             title: '设置',
             active: 'setting',
             parentPath: '/dataset/:id',
-            parentName: 'DatasetDetail'
+            parentName: 'DatasetDetail',
+            hiddenDoc_type:'2'
           },
           component: () => import('@/views/dataset/DatasetSetting.vue')
         }
