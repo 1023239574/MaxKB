@@ -13,10 +13,13 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
 })
-
+let current ={
+  query:{}
+}
 // 路由前置拦截器
 router.beforeEach(
   async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    current = to
     if (to.name === '404') {
       next()
       return
@@ -58,10 +61,10 @@ export const getChildRouteList: (
   for (let index = 0; index < routeList.length; index++) {
     const route = routeList[index]
     if (name === route.name && path === route.path) {
-      return route.children || []
+      return route.children?route.children.filter(item => current?.query?.doc_type? item?.meta?.hiddenDoc_type != current.query.doc_type :true) : []
     }
     if (route.children && route.children.length > 0) {
-      const result = getChildRouteList(route.children, path, name)
+      const result = getChildRouteList(route.children , path, name)
       if (result && result?.length > 0) {
         return result
       }

@@ -32,10 +32,10 @@ const useDatasetStore = defineStore({
     saveDocumentsFile(file: UploadUserFile[]) {
       this.documentsFiles = file
     },
-    async asyncGetAllDataset(loading?: Ref<boolean>) {
+    async asyncGetAllDataset(loading?: Ref<boolean>,params?:any) {
       return new Promise((resolve, reject) => {
         datasetApi
-          .getAllDataset(loading)
+          .getAllDataset(loading,params)
           .then((data) => {
             resolve(data)
           })
