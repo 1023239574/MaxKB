@@ -13,9 +13,9 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
 })
-let current ={
-  query:{}
-}
+
+let current: RouteLocationNormalized;
+
 // 路由前置拦截器
 router.beforeEach(
   async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
@@ -61,7 +61,8 @@ export const getChildRouteList: (
   for (let index = 0; index < routeList.length; index++) {
     const route = routeList[index]
     if (name === route.name && path === route.path) {
-      return route.children?route.children.filter(item => current?.query?.doc_type? item?.meta?.hiddenDoc_type != current.query.doc_type :true) : []
+      const docType = (current.query as { doc_type?: string }).doc_type; // 类型断言
+      return route.children?route.children.filter(item => docType? item?.meta?.hiddenDoc_type != docType :true) : []
     }
     if (route.children && route.children.length > 0) {
       const result = getChildRouteList(route.children , path, name)
