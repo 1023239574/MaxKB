@@ -79,7 +79,7 @@
                                 v-if="item.type === '1'"
                                 >同步</el-dropdown-item
                               >
-                              <el-dropdown-item @click="reEmbeddingDataset(item)">
+                              <el-dropdown-item @click="reEmbeddingDataset(item)" v-if="currentdocType!='2'">
                                 <AppIcon
                                   iconName="app-document-refresh"
                                   style="font-size: 16px"
@@ -88,11 +88,12 @@
                               >
                               <el-dropdown-item
                                 icon="Setting"
+                                 v-if="currentdocType!='2'"
                                 @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
                               >
                                 设置</el-dropdown-item
                               >
-                              <el-dropdown-item @click.stop="export_dataset(item)">
+                              <el-dropdown-item @click.stop="export_dataset(item)" v-if="currentdocType!='2'">
                                 <AppIcon iconName="app-export"></AppIcon>导出</el-dropdown-item
                               >
                               <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)"

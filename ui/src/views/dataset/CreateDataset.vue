@@ -85,6 +85,7 @@ async function next() {
   if (await StepFirstRef.value?.onSubmit()) {
     if (documentsType.value === 'QA') {
       let fd = new FormData()
+      fd.append('doc_type', doc_type )
       documentsFiles.value.forEach((item: any) => {
         if (item?.raw) {
           fd.append('file', item?.raw)
