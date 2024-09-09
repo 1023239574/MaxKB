@@ -25,7 +25,7 @@
           :loading="loading"
         >
           <el-row :gutter="15">
-            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16" v-if="currentdocType!=2">
+            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16" v-if="currentdocType!='2'">
               <CardAdd title="创建知识库" @click="router.push({ path: '/dataset/create',query: { doc_type: currentdocType} })" />
             </el-col>
             <template v-for="(item, index) in datasetList" :key="index">
@@ -61,9 +61,9 @@
                       <div>
                         <span class="bold">{{ item?.document_count || 0 }}</span>
                         文档
-                        <span v-if="currentdocType!=2"><el-divider direction="vertical" /><span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
+                        <span v-if="currentdocType!='2'"><el-divider direction="vertical" /><span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
                         字符</span>
-                        <span v-if="currentdocType!=2"><el-divider direction="vertical" /><span class="bold">{{ item?.application_mapping_count || 0 }}</span>
+                        <span v-if="currentdocType!='2'"><el-divider direction="vertical" /><span class="bold">{{ item?.application_mapping_count || 0 }}</span>
                         关联应用</span>
                       </div>
                       <div @click.stop>
